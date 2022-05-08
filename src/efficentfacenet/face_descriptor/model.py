@@ -1,16 +1,18 @@
 from functools import partial
-
+import PIL
 from torch.hub import load_state_dict_from_url
 from torchvision.models import EfficientNet
-from torch import nn, load, save
+from torch import load, save, flatten,nn
 from torchvision.models.efficientnet import MBConvConfig, model_urls
+EFFICENTNET_VERSIONS = []
 
 
 class FaceDescriptorModel(EfficientNet):
 
-    def __init__(self, download_weights, version, **kwargs):
+    def __init__(self, download_weights, version,output_size=128, **kwargs):
         progress = True
-        super(FaceDescriptorModel, self).__init__(efficientnet_args(version, kwargs))
+        args = efficientnet_args(version)
+        super(FaceDescriptorModel, self).__init__(*args, **kwargs)
         if download_weights:
             if model_urls.get(version, None) is None:
                 raise ValueError(f"No checkpoint is available for model type {version}")
@@ -18,7 +20,7 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier = nn.Sequential(nn.Dropout(0.25), nn.Linear(2048, 128))
+        self.classifier=nn.Sequential(nn.Dropout(0.2),nn.Linear(self.features[-1][0].out_channels,output_size))
 
     def load_local_weights(self, path):
         state_dict = load(path)
@@ -27,6 +29,7 @@ class FaceDescriptorModel(EfficientNet):
     def save_weights(self, path):
         state_dict = self.state_dict()
         save(state_dict, path)
+
 
 
 def get_inverted_residual_setting(width_mult, depth_mult):
@@ -42,7 +45,7 @@ def get_inverted_residual_setting(width_mult, depth_mult):
     return inverted_residual_setting
 
 
-def efficientnet_args(version, **kwargs):
+def efficientnet_args(version):
     if version == "efficientnet_b1":
         width_mult = 1.0
         depth_mult = 1.1
@@ -51,6 +54,10 @@ def efficientnet_args(version, **kwargs):
         width_mult = 0.1
         depth_mult = 1.0
         dropout = 0.2
+    elif version == "efficientnet_b4":
+        width_mult = 1.4
+        depth_mult = 1.8
+        dropout = 0.4
     else:
         raise ValueError(f"invalid version of efficientnet '{version}' ")
-    return get_inverted_residual_setting(width_mult, depth_mult), dropout, kwargs
+    return get_inverted_residual_setting(width_mult, depth_mult), dropout
