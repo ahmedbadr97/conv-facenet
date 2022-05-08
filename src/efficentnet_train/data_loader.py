@@ -136,7 +136,7 @@ def data_generator(batch_size, imgs_dict, dataset_pth=None, transforms=None):
 
 
 class FacesDataset(Dataset):
-    def __init__(self, imgs_dict, dataset_path, no_of_rows, transform=None):
+    def __init__(self, dataset_path, no_of_rows, transform=None):
 
         names_list = np.array(os.listdir(dataset_path))
         np.random.shuffle(names_list)
@@ -150,9 +150,9 @@ class FacesDataset(Dataset):
                 self.single_img_persons.append((name, imgs))
             else:
                 self.multi_img_persons.append((name, imgs))
-        self.imgs_dict = imgs_dict
         self.no_of_rows = no_of_rows
         self.transform = transform
+        self.dataset_path=dataset_path
 
     def __getitem__(self, idx):
 
@@ -163,9 +163,10 @@ class FacesDataset(Dataset):
         a_img_name = '{}/{}'.format(rand_multi_photo_person[0], random_two_same_pics[0])
         p_img_name = '{}/{}'.format(rand_multi_photo_person[0], random_two_same_pics[1])
         n_img_name = '{}/{}'.format(rand_single_img_person[0], rand_single_img_person[1][0])
-        a_img = self.imgs_dict[a_img_name]
-        p_img = self.imgs_dict[p_img_name]
-        n_img = self.imgs_dict[n_img_name]
+
+        a_img = np.array(Image.open(self.dataset_path+"/"+a_img_name))
+        p_img = np.array(Image.open(self.dataset_path+"/"+p_img_name))
+        n_img = np.array(Image.open(self.dataset_path+"/"+n_img_name))
 
         if self.transform is not None:
             a_img = self.transform(a_img)
