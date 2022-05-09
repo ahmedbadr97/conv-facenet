@@ -6,8 +6,9 @@ import time
 import numpy as np
 from os.path import join as join_pth
 from PIL import Image
-from torch import tensor
+import torch
 from torch.utils.data import Dataset
+from torchvision.transforms.functional import normalize
 
 
 def generate_testing_data_set_frame(dataset_pth, a_neg_single_subset=True):
@@ -130,7 +131,7 @@ def data_generator(batch_size, imgs_dict, dataset_pth=None, transforms=None):
         a, p, n = np.array(a), np.array(p), np.array(n)
 
         if transforms is not None:
-            yield tensor(a), tensor(p), tensor(n)
+            yield torch.tensor(a), torch.tensor(p), torch.tensor(n)
         else:
             yield a, p, n
 
@@ -152,7 +153,7 @@ class FacesDataset(Dataset):
                 self.multi_img_persons.append((name, imgs))
         self.no_of_rows = no_of_rows
         self.transform = transform
-        self.dataset_path=dataset_path
+        self.dataset_path = dataset_path
 
     def __getitem__(self, idx):
 
@@ -164,9 +165,9 @@ class FacesDataset(Dataset):
         p_img_name = '{}/{}'.format(rand_multi_photo_person[0], random_two_same_pics[1])
         n_img_name = '{}/{}'.format(rand_single_img_person[0], rand_single_img_person[1][0])
 
-        a_img = np.array(Image.open(self.dataset_path+"/"+a_img_name))
-        p_img = np.array(Image.open(self.dataset_path+"/"+p_img_name))
-        n_img = np.array(Image.open(self.dataset_path+"/"+n_img_name))
+        a_img = np.array(Image.open(self.dataset_path + "/" + a_img_name))
+        p_img = np.array(Image.open(self.dataset_path + "/" + p_img_name))
+        n_img = np.array(Image.open(self.dataset_path + "/" + n_img_name))
 
         if self.transform is not None:
             a_img = self.transform(a_img)
@@ -178,3 +179,14 @@ class FacesDataset(Dataset):
 
     def __len__(self):
         return self.no_of_rows
+
+
+class Normalize(torch.nn.Module):
+
+    def forward(self, img):
+        t_mean = torch.mean(img, dim=[1, 2])
+        t_std = torch.std(img, dim=[1, 2])
+        return normalize(img, t_mean.__array__(), t_std.__array__())
+
+    def __init__(self):
+        super().__init__()
