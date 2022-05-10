@@ -44,9 +44,9 @@ def get_pic_features_dict(dataset_pth, model, transform=None,cuda=False):
                     pic_path = join_pth(folder_pth, pic_name)
                     face = load_image(pic_path, transform, True,cuda)
                     if cuda:
-                        features_vector = model(face)[0].cpu().numpy()
+                        features_vector = model(face)[0].cpu().__array__()
                     else:
-                        features_vector = model(face)[0].numpy()
+                        features_vector = model(face)[0].__array__()
                 except:
                     pic_features_dict[f'{name}/{pic_name}'] = None
 
