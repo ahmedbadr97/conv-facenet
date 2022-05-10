@@ -11,6 +11,60 @@ from torch.utils.data import Dataset
 from torchvision.transforms.functional import normalize
 
 
+def load_image(path, transform=None, expand=False,cuda=False):
+    img = Image.open(path)
+    if transform is not None:
+        img = transform(img)
+        if expand:
+            img = img.unsqueeze(0)
+        if cuda:
+            img=img.cuda()
+    else:
+        img = np.array(img)
+    return img
+
+
+def get_pic_features_dict(dataset_pth, model, transform=None,cuda=False):
+    cnt = 0.0
+    pic_features_dict = {}
+    names = os.listdir(dataset_pth)
+    model.eval()
+    if cuda:
+        model.cuda()
+    total_time_taken=0.0
+    total_names=float(len(names))
+    with torch.no_grad():
+        for name in names:
+            ts=time.time()
+            folder_pth = join_pth(dataset_pth, name)
+            pics_list = os.listdir(folder_pth)
+            for pic_name in pics_list:
+                features_vector = None
+                try:
+                    pic_path = join_pth(folder_pth, pic_name)
+                    face = load_image(pic_path, transform, True,cuda)
+                    if cuda:
+                        features_vector = model(face)[0].cpu().numpy()
+                    else:
+                        features_vector = model(face)[0].numpy()
+                except:
+                    pic_features_dict[f'{name}/{pic_name}'] = None
+
+                pic_features_dict[f'{name}/{pic_name}'] = features_vector
+            cnt+=1.0
+            te = time.time()
+            total_time_taken+=(te-ts)
+            avg_time_per_name=total_time_taken/cnt
+            finished_out_of_10=int((cnt*10.0)/total_names)
+            remaining_out_of_10=10-finished_out_of_10
+
+            sys.stdout.flush()
+            sys.stdout.write("\r data processed ["+ str('='*finished_out_of_10)+str('.'*remaining_out_of_10)+"] time remaing="+str(avg_time_per_name*(total_names-cnt)/60.0)[0:5] )
+
+    model.train()
+    return pic_features_dict
+
+
 def generate_testing_data_set_frame(dataset_pth, a_neg_single_subset=True):
     """
     :param dataset_pth: path to faces dataset root where root has root/person[i]/img[i] ...
