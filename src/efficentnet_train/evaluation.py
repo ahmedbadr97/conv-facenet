@@ -7,7 +7,6 @@ import numpy as np
 import torch
 
 
-
 def model_evaluation(dataVectorsDict, datasetFrame, threshold=0.5):
     error = 0
     data_cnt = datasetFrame.count()[0]
@@ -28,12 +27,10 @@ def model_evaluation(dataVectorsDict, datasetFrame, threshold=0.5):
         img1Path = row[0]
         img2Path = row[1]
 
-        try:
-            emp1 = dataVectorsDict[img1Path]
-            emp2 = dataVectorsDict[img2Path]
-        except:
-            emp1 = emp2 = None
-        if emp1 == None or emp2 == None:
+        emp1 = dataVectorsDict[img1Path]
+        emp2 = dataVectorsDict[img2Path]
+
+        if emp1 is None or emp2 is None:
             err_rows.append(row)
             continue
         result = findCosineDistance(emp1, emp2)
@@ -92,15 +89,15 @@ def model_evaluation(dataVectorsDict, datasetFrame, threshold=0.5):
 
     error_table = pd.DataFrame(error_matrix, columns=['Mertic', 'Value'])
 
-    folder_pth = ("\\models_evaluation_data\\face_recognition")
-    if not os.path.exists(folder_pth):
-        os.mkdir(folder_pth)
-    # TODO add dateTime to the filename
-    file_name = f"{model_name}__err.csv"
-    full_path = os.path.join(folder_pth, file_name)
-    error_table.to_csv(full_path)
-
-    file_name = f"{model_name}_conv.csv"
-    full_path = os.path.join(folder_pth, file_name)
-    confusion_table.to_csv(full_path)
-    return error_matrix, confusion_matrix
+    # folder_pth = ("\\models_evaluation_data\\face_recognition")
+    # if not os.path.exists(folder_pth):
+    #     os.mkdir(folder_pth)
+    # # TODO add dateTime to the filename
+    # file_name = f"{model_name}__err.csv"
+    # full_path = os.path.join(folder_pth, file_name)
+    # # error_table.to_csv(full_path)
+    #
+    # file_name = f"{model_name}_conv.csv"
+    # full_path = os.path.join(folder_pth, file_name)
+    # # confusion_table.to_csv(full_path)
+    return error_table, confusion_table

@@ -11,14 +11,12 @@ from torch.utils.data import Dataset
 from torchvision.transforms.functional import normalize
 
 
-def load_image(path, transform=None, expand=False,cuda=False):
+def load_image(path, transform=None, expand=False):
     img = Image.open(path)
     if transform is not None:
         img = transform(img)
         if expand:
             img = img.unsqueeze(0)
-        if cuda:
-            img=img.cuda()
     else:
         img = np.array(img)
     return img
@@ -42,11 +40,13 @@ def get_pic_features_dict(dataset_pth, model, transform=None,cuda=False):
                 features_vector = None
                 try:
                     pic_path = join_pth(folder_pth, pic_name)
-                    face = load_image(pic_path, transform, True,cuda)
+                    face = load_image(pic_path, transform, expand=True)
+
                     if cuda:
-                        features_vector = model(face)[0].cpu().__array__()
+                        face=face.cuda()
+                        features_vector = model(face)[0].cpu().tolist()
                     else:
-                        features_vector = model(face)[0].__array__()
+                        features_vector = model(face)[0].tolist()
                 except:
                     pic_features_dict[f'{name}/{pic_name}'] = None
 

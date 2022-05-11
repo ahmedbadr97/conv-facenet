@@ -1,15 +1,14 @@
 from functools import partial
-import PIL
 from torch.hub import load_state_dict_from_url
 from torchvision.models import EfficientNet
-from torch import load, save, flatten,nn
+from torch import load, save, nn
 from torchvision.models.efficientnet import MBConvConfig, model_urls
-EFFICENTNET_VERSIONS = []
+
 
 
 class FaceDescriptorModel(EfficientNet):
 
-    def __init__(self, download_weights, version,output_size=128, **kwargs):
+    def __init__(self, download_weights, version, output_size=128, **kwargs):
         progress = True
         args = efficientnet_args(version)
         super(FaceDescriptorModel, self).__init__(*args, **kwargs)
@@ -20,7 +19,8 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier=nn.Sequential(nn.Dropout(0.2),nn.Linear(self.features[-1][0].out_channels,output_size))
+        self.classifier = nn.Sequential(nn.Dropout(0.2), nn.Linear(self.features[-1][0].out_channels, 512),
+                                        nn.ReLU(inplace=True), nn.Linear(512, output_size),nn.Sigmoid())
 
     def load_local_weights(self, path):
         state_dict = load(path)
@@ -29,7 +29,6 @@ class FaceDescriptorModel(EfficientNet):
     def save_weights(self, path):
         state_dict = self.state_dict()
         save(state_dict, path)
-
 
 
 def get_inverted_residual_setting(width_mult, depth_mult):
