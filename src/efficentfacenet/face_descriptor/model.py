@@ -1,4 +1,6 @@
 from functools import partial
+
+import torch
 from torch.hub import load_state_dict_from_url
 from torchvision.models import EfficientNet
 from torch import load, save, nn
@@ -22,11 +24,16 @@ class FaceDescriptorModel(EfficientNet):
         self.classifier = nn.Sequential(nn.Dropout(0.2), nn.Linear(self.features[-1][0].out_channels, 512),
                                         nn.ReLU(inplace=True), nn.Linear(512, output_size),nn.Sigmoid())
 
-    def load_local_weights(self, path):
-        state_dict = load(path)
+    def load_local_weights(self, path,cuda_weights=False):
+        if cuda_weights:
+            device=torch.device('cpu')
+            state_dict = load(path,map_location=device)
+        else:
+            state_dict = load(path)
         self.load_state_dict(state_dict)
 
     def save_weights(self, path):
+
         state_dict = self.state_dict()
         save(state_dict, path)
 

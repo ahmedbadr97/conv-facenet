@@ -5,7 +5,7 @@ from torch import optim
 from torch.nn import TripletMarginLoss
 
 
-def train(model, epochs, learn_rate, train_loader, cuda):
+def triplet_loss_train(model, epochs, learn_rate, train_loader, cuda):
 
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
     loss_function = TripletMarginLoss()
