@@ -36,6 +36,25 @@ class FaceDescriptorModel(EfficientNet):
 
         state_dict = self.state_dict()
         save(state_dict, path)
+    def feature_vector(self, faces, transform=None):
+        """
+        calculate 128 feature vector for given image(s)
+
+        :param faces: after transform img must be tensor of size 240x240
+        :param transform:
+        :return: nx128 tensor feature vector where n is images size
+        """
+        self.eval()
+        shape=faces.shape
+        if transform is not None:
+            faces=transform(faces)
+        if len(shape)==3:
+            faces.unsqueeze(0)
+        with torch.no_grad():
+            output=self(faces)
+        return output
+
+
 
 
 def get_inverted_residual_setting(width_mult, depth_mult):
