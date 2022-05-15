@@ -68,7 +68,7 @@ def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False):
     return pic_features_dict
 
 
-def get_imgs_dict(dataset_pth) -> dict:
+def get_imgs_dict(dataset_pth, all_names=None) -> dict:
     """
     load all images in the dataset in a dictionary ,key is the image path relative to dataset path("person/image_name")
      and value is the image in numpy
@@ -77,7 +77,8 @@ def get_imgs_dict(dataset_pth) -> dict:
     """
     ts = time.time()
     images_dict = {}
-    all_names = os.listdir(dataset_pth)
+    if all_names is None:
+        all_names = os.listdir(dataset_pth)
     cnt = 0.0
     total = float(len(all_names))
     for name in all_names:
@@ -99,12 +100,23 @@ def get_imgs_dict(dataset_pth) -> dict:
 
 
 class FacesDataset(Dataset):
-    def __init__(self, dataset_path, no_of_rows, transform=None, img_features_dict=None, select_from_negative_cnt=0):
-
-        names_list = np.array(os.listdir(dataset_path))
-        np.random.shuffle(names_list)
+    def __init__(self, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False,
+                 subset=None,
+                 select_from_negative_cnt=0):
+        """
+        :param dataset_path: path that has folder of identities and each identity has it's photos
+        :param no_of_rows: limit of no of triplet rows you wish to generate (anchor_img,postive_img,negative_img)
+        :param subset:(percentage from 0.0 to 1.0) specify a percentage you wish to take from (identities) not all dataset
+        :param transform: (torch.transforms)
+        :param load_imgs_from_dict:(boolean) load all images from  {"identity/img_name":img} dictionary
+        :param img_features_dict: dictionary of {"identity/img_name":img_features} to select hard negative photo
+        :param select_from_negative_cnt: no of randomly chosen images you wish to have to select the hardest negative photo
+        """
+        names_list = os.listdir(dataset_path)
+        random.shuffle(names_list)
+        if subset is not None:
+            names_list = random.sample(names_list, int(subset * len(names_list)))
         self.person_imgs_list = []  # [(name, [list of photos])... ]
-        self.single_img_persons = []  # [(name, [one_photo])... ]
         for name in names_list:
             imgs = []
             for img_name in os.listdir(join_pth(dataset_path, name)):
@@ -113,8 +125,10 @@ class FacesDataset(Dataset):
         self.no_of_rows = no_of_rows
         self.transform = transform
         self.dataset_path = dataset_path
-        self.img_features_dict = img_features_dict
         self.select_from_negative_cnt = select_from_negative_cnt
+        self.load_imgs_from_dict = load_imgs_from_dict
+        if load_imgs_from_dict:
+            self.images_dict = get_imgs_dict(dataset_path, names_list)
 
     def get_min_dist_face(self, anchor_name, anchor_img_name):
         """
@@ -146,6 +160,9 @@ class FacesDataset(Dataset):
                 min_dist = dist
         return min_img_path
 
+    def load_imgs_dict(self):
+        self.images_dict = get_imgs_dict(self.dataset_path, )
+
     def __getitem__(self, idx):
 
         # 1- select random anchor person
@@ -161,9 +178,9 @@ class FacesDataset(Dataset):
         # 3- select random negative picture that it's feature close to the chosen person
         n_img_name = self.get_min_dist_face(anchor_per_name, anchor_img_name=random_two_same_pics[0])
 
-        a_img = np.array(Image.open(self.dataset_path + "/" + a_img_name))
-        p_img = np.array(Image.open(self.dataset_path + "/" + p_img_name))
-        n_img = np.array(Image.open(self.dataset_path + "/" + n_img_name))
+        a_img = self.load_img(a_img_name)
+        p_img = self.load_img(p_img_name)
+        n_img = self.load_img(n_img_name)
 
         if self.transform is not None:
             a_img = self.transform(a_img)
@@ -172,6 +189,13 @@ class FacesDataset(Dataset):
         if idx == self.no_of_rows:
             raise StopIteration
         return a_img, p_img, n_img
+
+    def load_img(self, img_path):
+        if not self.load_imgs_from_dict or img_path not in self.images_dict:
+            img = np.array(Image.open(self.dataset_path + "/" + img_path))
+        else:
+            img = self.images_dict[img_path]
+        return img
 
     def __len__(self):
         return self.no_of_rows
