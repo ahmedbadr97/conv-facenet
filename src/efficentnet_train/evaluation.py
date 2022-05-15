@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 
-def model_test(data_vectors_dict, dataset_frame, threshold=0.5, results_path=None):
+def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None):
     error = 0
     data_cnt = dataset_frame.count()[0]
     cnt = 0.0
@@ -26,8 +26,8 @@ def model_test(data_vectors_dict, dataset_frame, threshold=0.5, results_path=Non
         img1Path = row[0]
         img2Path = row[1]
 
-        emp1 = data_vectors_dict[img1Path]
-        emp2 = data_vectors_dict[img2Path]
+        emp1 = features_vectors_dict[img1Path]
+        emp2 = features_vectors_dict[img2Path]
 
         result = euclidean_distance(emp1, emp2)
         pred_dist = 0
