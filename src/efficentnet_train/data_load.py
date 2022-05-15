@@ -7,7 +7,7 @@ import numpy as np
 from os.path import join as join_pth
 from PIL import Image
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, IterableDataset
 from torchvision.transforms.functional import normalize
 from . import utils
 
@@ -99,8 +99,8 @@ def get_imgs_dict(dataset_pth, all_names=None) -> dict:
     return images_dict
 
 
-class FacesDataset(Dataset):
-    def __init__(self, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False,
+class FacesDataset(IterableDataset):
+    def __init__(self, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False, img_features_dict=None,
                  subset=None,
                  select_from_negative_cnt=0):
         """
@@ -125,6 +125,7 @@ class FacesDataset(Dataset):
         self.no_of_rows = no_of_rows
         self.transform = transform
         self.dataset_path = dataset_path
+        self.img_features_dict = img_features_dict
         self.select_from_negative_cnt = select_from_negative_cnt
         self.load_imgs_from_dict = load_imgs_from_dict
         if load_imgs_from_dict:
@@ -163,32 +164,30 @@ class FacesDataset(Dataset):
     def load_imgs_dict(self):
         self.images_dict = get_imgs_dict(self.dataset_path, )
 
-    def __getitem__(self, idx):
-
-        # 1- select random anchor person
-        anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
-        while len(anchor_imgs) < 2:
+    def __iter__(self):
+        for i in range(self.no_of_rows):
+            # 1- select random anchor person
             anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
-        # 2- select two random pictures for the choosen person
-        random_two_same_pics = random.sample(anchor_imgs, 2)
+            while len(anchor_imgs) < 2:
+                anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
+            # 2- select two random pictures for the choosen person
+            random_two_same_pics = random.sample(anchor_imgs, 2)
 
-        a_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[0])
-        p_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[1])
+            a_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[0])
+            p_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[1])
 
-        # 3- select random negative picture that it's feature close to the chosen person
-        n_img_name = self.get_min_dist_face(anchor_per_name, anchor_img_name=random_two_same_pics[0])
+            # 3- select random negative picture that it's feature close to the chosen person
+            n_img_name = self.get_min_dist_face(anchor_per_name, anchor_img_name=random_two_same_pics[0])
 
-        a_img = self.load_img(a_img_name)
-        p_img = self.load_img(p_img_name)
-        n_img = self.load_img(n_img_name)
+            a_img = self.load_img(a_img_name)
+            p_img = self.load_img(p_img_name)
+            n_img = self.load_img(n_img_name)
 
-        if self.transform is not None:
-            a_img = self.transform(a_img)
-            p_img = self.transform(p_img)
-            n_img = self.transform(n_img)
-        if idx == self.no_of_rows:
-            raise StopIteration
-        return a_img, p_img, n_img
+            if self.transform is not None:
+                a_img = self.transform(a_img)
+                p_img = self.transform(p_img)
+                n_img = self.transform(n_img)
+            yield a_img, p_img, n_img
 
     def load_img(self, img_path):
         if not self.load_imgs_from_dict or img_path not in self.images_dict:
