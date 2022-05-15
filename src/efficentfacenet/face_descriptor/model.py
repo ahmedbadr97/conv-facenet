@@ -21,8 +21,8 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier = nn.Sequential(nn.Dropout(0.2), nn.Linear(self.features[-1][0].out_channels, 512),
-                                        nn.ReLU(inplace=True), nn.Linear(512, output_size),nn.Sigmoid())
+        self.classifier = nn.Sequential(nn.Dropout(0.2), nn.Linear(self.features[-1][0].out_channels, 256),
+                                        nn.ReLU(inplace=True), nn.Linear(256, output_size))
 
     def load_local_weights(self, path,cuda_weights=False):
         if cuda_weights:
