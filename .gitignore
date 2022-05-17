@@ -3,3 +3,5 @@
 dataset/
 __pycache__/
 model_weights/training/
+test.ipynb
+face_detection/

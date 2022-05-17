@@ -1,0 +1,11 @@
+Train Loss,no train rows,Test Loss,No test rows,Time taken (M),Notes,Date,Time
+0.280172919678092,100000,0.3423203002023697,25000,65.2,remove sigmoid from classifier + input normalization,15/05/2022,23:26:00
+0.9898972175908088,100000,1.00032,25000,60.1,remove sigmoid from classifier + input normalization,16/05/2022,00:27:00
+1.0,100000,1.00032,25000,60.2,remove sigmoid from classifier + input normalization,16/05/2022,01:27:00
+0.173324655482769,50000,0.2843270099759102,10000,63.0,remove sigmoid from classifier + input normalization,16/05/2022,19:28:00
+0.24391918601632118,50000,0.2814806838750839,10000,60.0,remove sigmoid from classifier + input normalization,16/05/2022,20:28:00
+0.21051593739509583,50000,0.2384767996072769,10000,59.9,remove sigmoid from classifier + input normalization,16/05/2022,21:28:00
+0.12199950783252717,50000,0.25976007386446,10000,62.9,remove sigmoid from classifier + input normalization,16/05/2022,22:38:00
+0.19762582211971283,50000,0.2609421953201294,10000,60.1,remove sigmoid from classifier + input normalization,16/05/2022,23:38:00
+0.16866767198324203,50000,0.2168223065853119,10000,60.2,remove sigmoid from classifier + input normalization,17/05/2022,00:38:00
+0.09714903524637222,25000,0.26825422685146333,5000,31.3,Add sigmoid to classifier + input normalization,17/05/2022,14:29:00
