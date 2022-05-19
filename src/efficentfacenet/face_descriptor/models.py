@@ -121,7 +121,7 @@ def efficientnet_args(version):
         depth_mult = 1.1
         dropout = 0.2
     elif version == "efficientnet_b0":
-        width_mult = 0.1
+        width_mult = 1.0
         depth_mult = 1.0
         dropout = 0.2
     elif version == "efficientnet_b4":

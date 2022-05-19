@@ -82,3 +82,12 @@ Train Loss,no train rows,Test Loss,No test rows,Time taken (M),Notes,Date,Time
 0.205081829,10000,0.50441293,1000,12.2,"Classifier -->(1280,256,128) + stop 1st 5 layers ",19/05/2022,5:24:00
 0.681868276977539,10000,0.5088544054985047,2500,15.8,"Classifier -->(1280,512,128)+ sigmoid + input standardization+ stop 1st 5 layers ",19/05/2022,06:21:00
 0.37397772315740585,10000,0.44810641889572145,2500,15.2,"Classifier -->(1280,512,128)+ sigmoid + input standardization+ stop 1st 5 layers ",19/05/2022,06:36:00
+0.2988915225028992,10000,0.35745824155807493,2500,15.1,"Classifier -->(1280,512,128)+ sigmoid + input standardization+ stop 1st 5 layers ",19/05/2022,06:51:00
+0.291977357172966,10000,0.3749023107528687,2500,15.1,"Classifier -->(1280,512,128)+ sigmoid + input standardization+ stop 1st 5 layers ",19/05/2022,07:06:00
+0.2501455607652664,10000,0.4076108587265015,2500,15.2,"Classifier -->(1280,512,128)+ sigmoid + input standardization+ stop 1st 5 layers ",19/05/2022,07:21:00
+2.2462487066745758,10000,1.9288111234664918,2500,17.0,"Classifier -->(1280,256,128)+ clear classifier weights cont training on cnn weights stop 1st 3 layers add more dropout to classifer , add img standardization , increase learning rate from 0.0001 to 0.001",19/05/2022,07:45:00
+2.356012768304348,10000,2.0031998805999756,2500,16.2,"Classifier -->(1280,256,128)+ clear classifier weights cont training on cnn weights stop 1st 3 layers add more dropout to classifer , add img standardization , increase learning rate from 0.0001 to 0.001",19/05/2022,08:01:00
+2.2320020241737364,5000,2.0134266290664673,1000,5.9,"Classifier -->(1280,256,128)+ full model train , effnetb0 , input standardization",19/05/2022,18:07:00
+105.4130958152771,5000,1.9999998807907104,1000,5.7,"Classifier -->(1280,256,128)+ full model train , effnetb0 , input standardization",19/05/2022,18:13:00
+2.2540807883262635,5000,2.3745537247657778,1000,4.9,"Classifier -->(1280,256,128)+ full model train , effnetb0 ",19/05/2022,18:21:00
+2.0508026998519897,5000,1.9999998807907104,1000,4.7,"Classifier -->(1280,256,128)+ full model train , effnetb0 ",19/05/2022,18:26:00
