@@ -1,1 +1,1 @@
-from .model import FaceDescriptorModel
+from .models import FaceDescriptorModel

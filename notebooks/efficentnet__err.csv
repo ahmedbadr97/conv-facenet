@@ -1,0 +1,11 @@
+,Mertic,Value
+0,processed rows,484414.0
+1,Model accuracy on Proceed Faces %,79.957
+2,False Positive,84492.0
+3,False Negative,12601.0
+4,precision,0.7309988252111596
+5,recall,0.9479703395428722
+6,fbeta-score,0.40653229285797166
+7,avg same person distance,6.388590446383068
+8,avg diff person distance,14.393440000549372
+9,Model tolerance,11.0
