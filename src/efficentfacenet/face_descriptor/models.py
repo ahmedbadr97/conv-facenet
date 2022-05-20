@@ -1,29 +1,44 @@
 from functools import partial
+from typing import Dict, Optional
 
 import torch
 from torch.hub import load_state_dict_from_url
-from torchvision.models import EfficientNet
+from torchvision.models.convnext import *
 from torch import load, save, nn
+from torchvision.models.convnext import CNBlockConfig
 from torchvision.models.efficientnet import MBConvConfig, model_urls
 import torch.nn.functional as F
 
 
-class FaceDescriptorModel(EfficientNet):
+_MODELS_URLS: Dict[str, Optional[str]] = {
+    "convnext_tiny": "https://download.pytorch.org/models/convnext_tiny-983f1562.pth",
+    "convnext_small": "https://download.pytorch.org/models/convnext_small-0c510722.pth",
+    "convnext_base": "https://download.pytorch.org/models/convnext_base-6075fbad.pth",
+    "convnext_large": "https://download.pytorch.org/models/convnext_large-ea097f82.pth",
+}
+class FaceDescriptorModel(ConvNeXt):
 
     def __init__(self, download_weights, version, output_size=128, **kwargs):
         progress = True
-        args = efficientnet_args(version)
-        super(FaceDescriptorModel, self).__init__(*args, **kwargs)
+        block_setting = [
+            CNBlockConfig(96, 192, 3),
+            CNBlockConfig(192, 384, 3),
+            CNBlockConfig(384, 768, 9),
+            CNBlockConfig(768, None, 3),
+        ]
+        stochastic_depth_prob = kwargs.pop("stochastic_depth_prob", 0.1)
+        super().__init__(block_setting, stochastic_depth_prob=stochastic_depth_prob, **kwargs)
+        arch="convnext_tiny"
         if download_weights:
-            if model_urls.get(version, None) is None:
-                raise ValueError(f"No checkpoint is available for model type {version}")
-            state_dict = load_state_dict_from_url(model_urls[version], progress=progress)
+            if arch not in _MODELS_URLS:
+                raise ValueError(f"No checkpoint is available for model type {arch}")
+            state_dict = load_state_dict_from_url(_MODELS_URLS[arch], progress=progress)
             self.load_state_dict(state_dict)
 
-        # Change Full connected layer
-        self.classifier = nn.Sequential( nn.Linear(self.features[-1][0].out_channels, 256),
+
+        self.classifier = nn.Sequential(self.classifier[0],self.classifier[1], nn.Linear(768, 256),
                                         nn.Dropout(0.3),
-                                        nn.ReLU(inplace=True), nn.Dropout(0.3),nn.Linear(256, 128))
+                                        nn.ReLU(inplace=True), nn.Dropout(0.3),nn.Linear(256, 128), nn.ReLU(inplace=True))
 
     def load_local_weights(self, path, cuda_weights=False):
         if cuda_weights:
