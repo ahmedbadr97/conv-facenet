@@ -1,1 +1,1 @@
-from .model import FaceDescriptorModel,EfficientFacenet
+from .models import FaceDescriptorModel,EfficientFacenet

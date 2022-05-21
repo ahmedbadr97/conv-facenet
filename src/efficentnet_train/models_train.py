@@ -39,7 +39,7 @@ def triplet_loss_test(model, test_loader, loss_function, cuda):
             time_remaing = avg_time * (no_batches - cnt)
             sys.stdout.write("\r Testing  [" + str(
                 "=" * finished + str("." * remaining) + "] time remaining = " + str(
-                    time_remaing / 60.0)[:8]))
+                    time_remaing / 60.0)[:8]+ " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
 
             test_loss = loss_sum / dataset_size
 
@@ -55,13 +55,15 @@ def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cud
     no_batches = len(train_loader)
     dataset_size = float(len(train_loader.dataset))
     min_train_loss = 800000
-    min_test_loss = 800000
     model.train()
     if cuda:
         model.cuda()
 
     train_losses = []
     test_losses = []
+    print("Testing before training ...")
+    min_test_loss=triplet_loss_test(model,test_loader,loss_function,cuda)
+    print(f"Test Loss before Training={min_test_loss}")
     for e in range(epochs):
         epoch_start_time = time.time()
         loss_sum = 0.0
@@ -97,7 +99,7 @@ def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cud
             time_remaing = avg_time * (no_batches - cnt)
             sys.stdout.write("\r epoch " + str(e + 1) + " [" + str(
                 "=" * int((cnt * 10) / no_batches) + str("." * remaining) + "] time remaining = " + str(
-                    time_remaing / 60.0)[:8]))
+                    time_remaing / 60.0)[:8]) + " Avg Train_Loss=" + str(loss_sum / (cnt * batch_size))[:8])
         print()
         train_loss = loss_sum / dataset_size
         train_losses.append(train_loss)
@@ -107,9 +109,9 @@ def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cud
 
         print()
         print(f" epoch {e + 1} train_loss ={train_loss} test_loss={test_loss}")
-        if train_loss < min_train_loss and test_loss < min_test_loss:
+        if  test_loss < min_test_loss:
             print(
-                f"new minimum test loss {str(train_loss)[:8]} and train loss {str(test_loss)[:8]}", end=" ")
+                f"new minimum test loss {str(test_loss)[:8]} ", end=" ")
             if weight_saving_path is not None:
                 save_train_weights(model, train_loss, test_loss, weight_saving_path)
                 print("achieved, model weights saved", end=" ")
@@ -160,3 +162,9 @@ def save_epochs_to_csv(csv_save_path, train_loss, no_train_rows, test_loss, no_t
         df.to_csv(full_path, index=False)
     else:
         df.to_csv(full_path, mode='a', header=False, index=False)
+
+
+def full_classification_train(face_descriptor, face_identifier, epochs, learn_rate, train_loader, test_loader,
+                              cuda=False, weight_saving_path=None,
+                              epoch_data_saving_path=None, notes=None):
+    pass

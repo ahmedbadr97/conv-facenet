@@ -8,3 +8,6 @@ test.ipynb
 notebooks/grp.jpg
 notebooks/test.ipynb
 src/efficentfacenet/face_detection/
+
+test.ipynb
+face_detection/

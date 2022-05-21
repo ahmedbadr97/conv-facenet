@@ -5,7 +5,7 @@ from torch.hub import load_state_dict_from_url
 from torchvision.models import EfficientNet
 from torch import load, save, nn
 from torchvision.models.efficientnet import MBConvConfig, model_urls
-
+import torch.nn.functional as F
 
 
 class FaceDescriptorModel(EfficientNet):
@@ -21,14 +21,14 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier = nn.Sequential( nn.Linear(self.features[-1][0].out_channels, 256),
-                                        nn.Dropout(0.5),
+        self.classifier = nn.Sequential(nn.Dropout(0.3),nn.Linear(self.features[-1][0].out_channels, 256),
+                                        nn.Dropout(0.3),
                                         nn.ReLU(inplace=True), nn.Dropout(0.3),nn.Linear(256, 128))
 
-    def load_local_weights(self, path,cuda_weights=False):
+    def load_local_weights(self, path, cuda_weights=False):
         if cuda_weights:
-            device=torch.device('cpu')
-            state_dict = load(path,map_location=device)
+            device = torch.device('cpu')
+            state_dict = load(path, map_location=device)
         else:
             state_dict = load(path)
         self.load_state_dict(state_dict)
@@ -37,6 +37,7 @@ class FaceDescriptorModel(EfficientNet):
 
         state_dict = self.state_dict()
         save(state_dict, path)
+
     def feature_vector(self, faces, transform=None):
         """
         calculate 128 feature vector for given image(s)
@@ -46,15 +47,14 @@ class FaceDescriptorModel(EfficientNet):
         :return: nx128 tensor feature vector where n is images size
         """
         self.eval()
-        shape=faces.shape
+        shape = faces.shape
         if transform is not None:
-            faces=transform(faces)
-        if len(shape)==3:
+            faces = transform(faces)
+        if len(shape) == 3:
             faces.unsqueeze(0)
         with torch.no_grad():
-            output=self(faces)
+            output = self(faces)
         return output
-
 
 
 class EfficientFacenet(nn.Module):
@@ -66,12 +66,17 @@ class EfficientFacenet(nn.Module):
                                         nn.Linear(128, 32), nn.ReLU(inplace=True), nn.Linear(32, 1), nn.Sigmoid())
 
     def forward(self, face_x, face_y):
-        assert face_x.shape==face_y.shape
-        feature_vector_1=self.descriptor(face_x)
-        feature_vector_2=self.descriptor(face_y)
+        x = torch.cat((face_x, face_y))
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.dropout(x)
 
-        x = torch.cat((feature_vector_1, feature_vector_2),dim=1)
-        x=self.classifier(x)
+        x = self.fc2(x)
+        x = F.relu(x)
+        x = self.dropout(x)
+
+        x = self.fc3(x)
+        x = F.sigmoid(x)
         return x
 
     def load_local_weights(self, path, cuda_weights=False):
@@ -97,7 +102,6 @@ class EfficientFacenet(nn.Module):
         return output
 
 
-
 def get_inverted_residual_setting(width_mult, depth_mult):
     bneck_conf = partial(MBConvConfig, width_mult=width_mult, depth_mult=depth_mult)
     inverted_residual_setting = [
@@ -112,13 +116,12 @@ def get_inverted_residual_setting(width_mult, depth_mult):
 
 
 def efficientnet_args(version):
-
     if version == "efficientnet_b1":
         width_mult = 1.0
         depth_mult = 1.1
         dropout = 0.2
     elif version == "efficientnet_b0":
-        width_mult =1.0
+        width_mult = 1.0
         depth_mult = 1.0
         dropout = 0.2
     elif version == "efficientnet_b4":
