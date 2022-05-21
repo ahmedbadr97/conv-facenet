@@ -49,19 +49,21 @@ def triplet_loss_test(model, test_loader, loss_function, cuda):
 def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cuda=False, weight_saving_path=None,
                        epoch_data_saving_path=None, notes=None
                        ):
-    optimizer = optim.RMSprop(model.parameters(), lr=learn_rate)
-    loss_function = TripletMarginLoss(margin=2)
+    optimizer = optim.Adam(model.parameters(), lr=learn_rate)
+    loss_function = TripletMarginLoss()
     batch_size = train_loader.batch_size
     no_batches = len(train_loader)
     dataset_size = float(len(train_loader.dataset))
     min_train_loss = 800000
-    min_test_loss = 800000
     model.train()
     if cuda:
         model.cuda()
 
     train_losses = []
     test_losses = []
+    print("Testing before training ...")
+    min_test_loss=triplet_loss_test(model,test_loader,loss_function,cuda)
+    print(f"Test Loss before Training={min_test_loss}")
     for e in range(epochs):
         epoch_start_time = time.time()
         loss_sum = 0.0

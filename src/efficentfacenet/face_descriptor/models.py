@@ -21,7 +21,7 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier = nn.Sequential( nn.Linear(self.features[-1][0].out_channels, 256),
+        self.classifier = nn.Sequential(nn.Dropout(0.3),nn.Linear(self.features[-1][0].out_channels, 256),
                                         nn.Dropout(0.3),
                                         nn.ReLU(inplace=True), nn.Dropout(0.3),nn.Linear(256, 128))
 
