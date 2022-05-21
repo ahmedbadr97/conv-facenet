@@ -21,8 +21,9 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier = nn.Sequential(nn.Dropout(0.2), nn.Linear(self.features[-1][0].out_channels, 256),
-                                        nn.ReLU(inplace=True), nn.Linear(256, output_size))
+        self.classifier = nn.Sequential( nn.Linear(self.features[-1][0].out_channels, 256),
+                                        nn.Dropout(0.5),
+                                        nn.ReLU(inplace=True), nn.Dropout(0.3),nn.Linear(256, 128))
 
     def load_local_weights(self, path,cuda_weights=False):
         if cuda_weights:
@@ -56,6 +57,46 @@ class FaceDescriptorModel(EfficientNet):
 
 
 
+class EfficientFacenet(nn.Module):
+    def __init__(self, face_features_dim=128):
+        super().__init__()
+
+        self.descriptor=FaceDescriptorModel(False,"efficientnet_b1")
+        self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 128), nn.ReLU(inplace=True), nn.Dropout(0.25),
+                                        nn.Linear(128, 32), nn.ReLU(inplace=True), nn.Linear(32, 1), nn.Sigmoid())
+
+    def forward(self, face_x, face_y):
+        assert face_x.shape==face_y.shape
+        feature_vector_1=self.descriptor(face_x)
+        feature_vector_2=self.descriptor(face_y)
+
+        x = torch.cat((feature_vector_1, feature_vector_2),dim=1)
+        x=self.classifier(x)
+        return x
+
+    def load_local_weights(self, path, cuda_weights=False):
+        if cuda_weights:
+            device = torch.device('cpu')
+            state_dict = load(path, map_location=device)
+        else:
+            state_dict = load(path)
+        self.load_state_dict(state_dict)
+
+    def save_weights(self, path):
+
+        state_dict = self.state_dict()
+        save(state_dict, path)
+
+    def identify_faces(self, face_x, face_y, transform=None):
+        if transform is not None:
+            face_x = transform(face_x)
+            face_y = transform(face_y)
+        self.eval()
+        with torch.no_grad():
+            output = self.forward(face_x, face_y)
+        return output
+
+
 
 def get_inverted_residual_setting(width_mult, depth_mult):
     bneck_conf = partial(MBConvConfig, width_mult=width_mult, depth_mult=depth_mult)
@@ -71,12 +112,13 @@ def get_inverted_residual_setting(width_mult, depth_mult):
 
 
 def efficientnet_args(version):
+
     if version == "efficientnet_b1":
         width_mult = 1.0
         depth_mult = 1.1
         dropout = 0.2
     elif version == "efficientnet_b0":
-        width_mult = 0.1
+        width_mult =1.0
         depth_mult = 1.0
         dropout = 0.2
     elif version == "efficientnet_b4":

@@ -3,3 +3,8 @@
 dataset/
 __pycache__/
 model_weights/training/
+test.ipynb
+ notebooks/000006.jpg
+notebooks/grp.jpg
+notebooks/test.ipynb
+src/efficentfacenet/face_detection/
