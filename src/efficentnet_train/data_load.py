@@ -183,10 +183,6 @@ class FacesDataset(IterableDataset):
             p_img = self.load_img(p_img_name)
             n_img = self.load_img(n_img_name)
 
-            if self.transform is not None:
-                a_img = self.transform(a_img)
-                p_img = self.transform(p_img)
-                n_img = self.transform(n_img)
             yield a_img, p_img, n_img
 
     def load_img(self, img_path):
@@ -194,10 +190,34 @@ class FacesDataset(IterableDataset):
             img = np.array(Image.open(self.dataset_path + "/" + img_path))
         else:
             img = self.images_dict[img_path]
+
+        if self.transform is not None:
+            img=self.transform(img)
         return img
 
     def __len__(self):
         return self.no_of_rows
+class FacesPairDataset(FacesDataset):
+    def __init__(self, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False, img_features_dict=None,
+                 subset=None,
+                 select_from_negative_cnt=0):
+        super().__init__(dataset_path, no_of_rows,transform,load_imgs_from_dict,img_features_dict,subset,select_from_negative_cnt)
+    def __iter__(self):
+        for i in range(self.no_of_rows):
+            for anchor_name,anchor_imgs in self.person_imgs_list:
+                for i in range(len(anchor_imgs)):
+                    # anchor
+                    anchor_img_path = f'{self.dataset_path}/{anchor_name}/{anchor_imgs[i]}'
+                    anchor_img=self.load_img(anchor_img_path)
+
+                    for j in range(i + 1, len(anchor_imgs)):
+                        anchor_positive_img_path=f'{self.dataset_path}/{anchor_name}/{anchor_imgs[j]}'
+                        anchor_positive_img=self.load_img(anchor_positive_img_path)
+
+                        yield anchor_img,anchor_positive_img,1
+
+
+
 
 
 class Normalize(torch.nn.Module):
