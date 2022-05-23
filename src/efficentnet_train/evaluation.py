@@ -18,34 +18,34 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
     total_dist_diff_persons = 0.0
     avg_dist_same_persons = 0.0
     avg_dist_diff_persons = 0.0
-
+    # 1--> two faces are for same person 0--> two faces are for different persons
     time_sum = 0.0
     for _, row in dataset_frame.iterrows():
         ts = time.time()
 
-        img1Path = row[0]
-        img2Path = row[1]
+        img1_path = row[0]
+        img2_path = row[1]
 
-        emp1 = features_vectors_dict[img1Path]
-        emp2 = features_vectors_dict[img2Path]
+        emp1 = features_vectors_dict[img1_path]
+        emp2 = features_vectors_dict[img2_path]
 
         result = euclidean_distance(emp1, emp2)
-        pred_dist = 0
-        actual_dist = row[2]
-        if result > threshold:
-            pred_dist = 1
+        pred_label = 0
+        actual_label = row[2]
+        if result <= threshold:
+            pred_label = 1
 
-        if pred_dist != int(row[2]):
+        if pred_label != int(row[2]):
             error += 1
-        confusion_matrix[pred_dist][actual_dist] += 1
-        if pred_dist == 0 and actual_dist == 1:
+        confusion_matrix[int(not pred_label)][int (not actual_label)] += 1
+        if pred_label == 1 and actual_label == 0:
             false_positive_rows.append(row)
-        if pred_dist == 1 and actual_dist == 0:
+        if pred_label == 0 and actual_label == 1:
             false_negative_rows.append(row)
-        if actual_dist == 0:
+        if actual_label == 1:
             avg_dist_same_persons += result
             total_dist_same_persons += 1
-        if actual_dist == 1:
+        if actual_label == 0:
             avg_dist_diff_persons += result
             total_dist_diff_persons += 1
 

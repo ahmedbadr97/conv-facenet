@@ -3,6 +3,7 @@ import numpy as np
 import os
 from os.path import join as join_pth
 
+
 def split_data(dataset_pth, split_ratio=0.2):
     names = os.listdir(dataset_pth)
     random.shuffle(names)
@@ -12,6 +13,8 @@ def split_data(dataset_pth, split_ratio=0.2):
     train_names_set = names_set.difference(test_names_set)
     train_names = list(train_names_set)
     return train_names, test_names
+
+
 def generate_testing_data_set_frame(dataset_pth, a_neg_single_subset=True):
     """
     :param dataset_pth: path to faces dataset root where root has root/person[i]/img[i] ...
@@ -44,15 +47,15 @@ def generate_testing_data_set_frame(dataset_pth, a_neg_single_subset=True):
             # anchor
             img1 = '{}/{}'.format(name, photos[i])
             for j in range(i + 1, len(photos)):
-                # row (img1,img2, distance=0)
+                # row (img1,img2, same=1)
                 # anchor postive
-                datasetList.append([img1, '{}/{}'.format(name, photos[j]), 0])
+                datasetList.append([img1, '{}/{}'.format(name, photos[j]), 1])
                 # anchor negative
                 if a_neg_single_subset:
                     rand_person = random.choice(single_img_persons)
                     rand_person_name = rand_person[0]
                     rand_photo = rand_person[1][0]
-                    datasetList.append([img1, '{}/{}'.format(rand_person_name, rand_photo), 1])
+                    datasetList.append([img1, '{}/{}'.format(rand_person_name, rand_photo), 0])
                 else:
                     rand_person = random.choice(all_persons_imgs)
                     while rand_person[0] == name:
@@ -60,5 +63,5 @@ def generate_testing_data_set_frame(dataset_pth, a_neg_single_subset=True):
                     rand_person_name = rand_person[0]
                     rand_person_photos = rand_person[1]
                     rand_photo = np.random.choice(rand_person_photos)
-                    datasetList.append([img1, '{}/{}'.format(rand_person_name, rand_photo), 1])
+                    datasetList.append([img1, '{}/{}'.format(rand_person_name, rand_photo), 0])
     return datasetList
