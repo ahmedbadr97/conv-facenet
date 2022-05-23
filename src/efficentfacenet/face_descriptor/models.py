@@ -21,9 +21,9 @@ class FaceDescriptorModel(EfficientNet):
             self.load_state_dict(state_dict)
 
         # Change Full connected layer
-        self.classifier = nn.Sequential(nn.Dropout(0.3),nn.Linear(self.features[-1][0].out_channels, 256),
+        self.classifier = nn.Sequential(nn.Dropout(0.3), nn.Linear(self.features[-1][0].out_channels, 256),
                                         nn.Dropout(0.3),
-                                        nn.ReLU(inplace=True), nn.Dropout(0.3),nn.Linear(256, 128))
+                                        nn.ReLU(inplace=True), nn.Dropout(0.3), nn.Linear(256, 128))
 
     def load_local_weights(self, path, cuda_weights=False):
         if cuda_weights:
@@ -61,23 +61,18 @@ class EfficientFacenet(nn.Module):
     def __init__(self, face_features_dim=128):
         super().__init__()
 
-        self.descriptor=FaceDescriptorModel(False,"efficientnet_b1")
+        self.descriptor = FaceDescriptorModel(False, "efficientnet_b1")
         self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 128), nn.ReLU(inplace=True), nn.Dropout(0.25),
                                         nn.Linear(128, 32), nn.ReLU(inplace=True), nn.Linear(32, 1), nn.Sigmoid())
 
     def forward(self, face_x, face_y):
-        x = torch.cat((face_x, face_y))
-        x = self.fc1(x)
-        x = F.relu(x)
-        x = self.dropout(x)
-
-        x = self.fc2(x)
-        x = F.relu(x)
-        x = self.dropout(x)
-
-        x = self.fc3(x)
-        x = F.sigmoid(x)
-        return x
+        assert face_x.shape == face_y.shape
+        assert len(face_x.shape) == len(face_y.shape) == 3
+        face_x_features = self.descriptor(face_x)
+        face_y_features = self.descriptor(face_y)
+        classifier_input = torch.cat((face_x_features, face_y_features), dim=1)
+        output = self.classifier(classifier_input)
+        return output
 
     def load_local_weights(self, path, cuda_weights=False):
         if cuda_weights:
