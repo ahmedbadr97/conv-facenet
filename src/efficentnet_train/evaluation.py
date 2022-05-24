@@ -35,7 +35,7 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
             result=evaluation_method(emp1,emp2)
         pred_label = 0
         actual_label = row[2]
-        if result <= threshold:
+        if result > threshold:
             pred_label = 1
 
         if pred_label != int(row[2]):
