@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 
-def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None):
+def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None,evaluation_method=None):
     error = 0
     data_cnt = dataset_frame.count()[0]
     cnt = 0.0
@@ -29,7 +29,10 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
         emp1 = features_vectors_dict[img1_path]
         emp2 = features_vectors_dict[img2_path]
 
-        result = euclidean_distance(emp1, emp2)
+        if evaluation_method is None:
+            result = euclidean_distance(emp1, emp2)
+        else:
+            result=evaluation_method(emp1,emp2)
         pred_label = 0
         actual_label = row[2]
         if result <= threshold:

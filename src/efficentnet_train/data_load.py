@@ -164,6 +164,27 @@ class FacesDataset(IterableDataset):
     def load_imgs_dict(self):
         self.images_dict = get_imgs_dict(self.dataset_path, )
 
+    def load_img(self, img_path):
+        if not self.load_imgs_from_dict or img_path not in self.images_dict:
+            img = np.array(Image.open(self.dataset_path + "/" + img_path))
+        else:
+            img = self.images_dict[img_path]
+
+        if self.transform is not None:
+            img = self.transform(img)
+        return img
+
+    def __len__(self):
+        return self.no_of_rows
+
+
+class FacesTripletDataset(FacesDataset):
+    def __init__(self, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False, img_features_dict=None,
+                 subset=None,
+                 select_from_negative_cnt=0):
+        super().__init__(dataset_path, no_of_rows, transform, load_imgs_from_dict, img_features_dict, subset,
+                         select_from_negative_cnt)
+
     def __iter__(self):
         for i in range(self.no_of_rows):
             # 1- select random anchor person
@@ -185,39 +206,45 @@ class FacesDataset(IterableDataset):
 
             yield a_img, p_img, n_img
 
-    def load_img(self, img_path):
-        if not self.load_imgs_from_dict or img_path not in self.images_dict:
-            img = np.array(Image.open(self.dataset_path + "/" + img_path))
-        else:
-            img = self.images_dict[img_path]
 
-        if self.transform is not None:
-            img=self.transform(img)
-        return img
-
-    def __len__(self):
-        return self.no_of_rows
 class FacesPairDataset(FacesDataset):
     def __init__(self, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False, img_features_dict=None,
                  subset=None,
                  select_from_negative_cnt=0):
-        super().__init__(dataset_path, no_of_rows,transform,load_imgs_from_dict,img_features_dict,subset,select_from_negative_cnt)
+        assert no_of_rows % 2 == 0
+
+        super().__init__(dataset_path, no_of_rows, transform, load_imgs_from_dict, img_features_dict, subset,
+                         select_from_negative_cnt)
+
     def __iter__(self):
-        for i in range(self.no_of_rows):
-            for anchor_name,anchor_imgs in self.person_imgs_list:
-                for i in range(len(anchor_imgs)):
-                    # anchor
-                    anchor_img_path = f'{self.dataset_path}/{anchor_name}/{anchor_imgs[i]}'
-                    anchor_img=self.load_img(anchor_img_path)
+        cnt = 0
+        random.shuffle(self.person_imgs_list)
 
-                    for j in range(i + 1, len(anchor_imgs)):
-                        anchor_positive_img_path=f'{self.dataset_path}/{anchor_name}/{anchor_imgs[j]}'
-                        anchor_positive_img=self.load_img(anchor_positive_img_path)
+        for anchor_name, anchor_imgs in self.person_imgs_list:
+            for i in range(len(anchor_imgs)):
+                # anchor
+                anchor_img_path = f'{anchor_name}/{anchor_imgs[i]}'
+                anchor_img = self.load_img(anchor_img_path)
 
-                        yield anchor_img,anchor_positive_img,1
+                for j in range(i + 1, len(anchor_imgs)):
+                    anchor_positive_img_path = f'{anchor_name}/{anchor_imgs[j]}'
+                    anchor_positive_img = self.load_img(anchor_positive_img_path)
 
+                    yield anchor_img, anchor_positive_img, torch.tensor([1.0])
 
+                    rand_person = random.choice(self.person_imgs_list)
+                    while rand_person[0] == anchor_name:
+                        rand_person = random.choice(self.person_imgs_list)
+                    rand_person_name = rand_person[0]
+                    rand_person_photos = rand_person[1]
+                    rand_photo = np.random.choice(rand_person_photos)
+                    anchor_negative_img_path = f'{rand_person_name}/{rand_photo}'
+                    anchor_negative_img = self.load_img(anchor_negative_img_path)
 
+                    yield anchor_img, anchor_negative_img, torch.tensor([0.0])
+                    cnt += 2
+                    if cnt == self.no_of_rows:
+                        return
 
 
 class Normalize(torch.nn.Module):

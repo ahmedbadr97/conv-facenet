@@ -58,16 +58,18 @@ class FaceDescriptorModel(EfficientNet):
 
 
 class EfficientFacenet(nn.Module):
-    def __init__(self, face_features_dim=128):
+    def __init__(self, face_features_dim=128, descriptor_weights_path=None):
         super().__init__()
 
         self.descriptor = FaceDescriptorModel(False, "efficientnet_b1")
+        if descriptor_weights_path is not None:
+            self.descriptor.load_local_weights(descriptor_weights_path, True)
         self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 128), nn.ReLU(inplace=True), nn.Dropout(0.25),
                                         nn.Linear(128, 32), nn.ReLU(inplace=True), nn.Linear(32, 1), nn.Sigmoid())
 
     def forward(self, face_x, face_y):
         assert face_x.shape == face_y.shape
-        assert len(face_x.shape) == len(face_y.shape) == 3
+        assert len(face_x.shape) == len(face_y.shape) == 4
         face_x_features = self.descriptor(face_x)
         face_y_features = self.descriptor(face_y)
         classifier_input = torch.cat((face_x_features, face_y_features), dim=1)
@@ -94,6 +96,12 @@ class EfficientFacenet(nn.Module):
         self.eval()
         with torch.no_grad():
             output = self.forward(face_x, face_y)
+        return output
+
+    def classify_face_features(self, face_x, face_y):
+        self.eval()
+        with torch.no_grad():
+            output = self.classifier(face_x, face_y)
         return output
 
 

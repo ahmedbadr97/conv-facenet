@@ -5,11 +5,11 @@ from datetime import datetime
 
 import pandas as pd
 from torch import optim, no_grad
-from torch.nn import TripletMarginLoss
+from torch.nn import TripletMarginLoss,BCELoss
 import torch
 
 
-def triplet_loss_test(model, test_loader, loss_function, cuda):
+def model_test(model, test_loader, loss_function, test_mod, cuda):
     batch_size = test_loader.batch_size
     no_batches = len(test_loader)
     dataset_size = float(len(test_loader.dataset))
@@ -20,16 +20,19 @@ def triplet_loss_test(model, test_loader, loss_function, cuda):
     cnt = 0.0
     time_sum = 0.0
     with no_grad():
-        for anchor_img, positive_img, negative_img in test_loader:
+        for data_row in test_loader:
             ts = time.time()
-            if cuda:
-                anchor_img, positive_img, negative_img = anchor_img.cuda(), positive_img.cuda(), negative_img.cuda()
-            anchor_vector = model(anchor_img)
-            positive_vector = model(positive_img)
-            negative_vector = model(negative_img)
-            loss = loss_function(anchor_vector, positive_vector, negative_vector)
-            loss_sum += loss.item() * batch_size
 
+            if test_mod == "triplet":
+                anchor_img, positive_img, negative_img = data_row
+                loss_sum += triplet_test_step(model, loss_function, anchor_img, positive_img, negative_img,
+                                              cuda)
+            elif test_mod == "pair":
+                face_x, face_y, label = data_row
+                loss_sum += pair_test_step(model, loss_function, face_x, face_y, label, cuda)
+
+            else:
+                raise ValueError("invalid test mod")
             cnt += 1.0
             finished = int((cnt * 10) / no_batches)
             remaining = 10 - finished
@@ -39,30 +42,35 @@ def triplet_loss_test(model, test_loader, loss_function, cuda):
             time_remaing = avg_time * (no_batches - cnt)
             sys.stdout.write("\r Testing  [" + str(
                 "=" * finished + str("." * remaining) + "] time remaining = " + str(
-                    time_remaing / 60.0)[:8]+ " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
+                    time_remaing / 60.0)[:8] + " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
 
             test_loss = loss_sum / dataset_size
 
         return test_loss
 
 
-def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cuda=False, weight_saving_path=None,
-                       epoch_data_saving_path=None, notes=None
-                       ):
+def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod, cuda=False, weight_saving_path=None,
+                epoch_data_saving_path=None, notes=None
+                ):
     optimizer = optim.Adam(model.parameters(), lr=learn_rate)
-    loss_function = TripletMarginLoss()
+
+    if train_mod == "triplet":
+        loss_function = TripletMarginLoss()
+    elif train_mod == "pair":
+        loss_function = BCELoss()
+    else:
+        raise ValueError("invalid train mod")
+
     batch_size = train_loader.batch_size
     no_batches = len(train_loader)
     dataset_size = float(len(train_loader.dataset))
-    min_train_loss = 800000
     model.train()
     if cuda:
         model.cuda()
-
     train_losses = []
     test_losses = []
     print("Testing before training ...")
-    min_test_loss=triplet_loss_test(model,test_loader,loss_function,cuda)
+    min_test_loss = model_test(model, test_loader, loss_function, train_mod, cuda)
     print(f"Test Loss before Training={min_test_loss}")
     for e in range(epochs):
         epoch_start_time = time.time()
@@ -70,25 +78,18 @@ def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cud
 
         cnt = 0.0
         time_sum = 0.0
-        for anchor_img, positive_img, negative_img in train_loader:
+        for data in train_loader:
             batch_start_t = time.time()
-            optimizer.zero_grad()
-            anchor_img.requires_grad = True
-            positive_img.requires_grad = True
-            negative_img.requires_grad = True
 
-            if cuda:
-                anchor_img, positive_img, negative_img = anchor_img.cuda(), positive_img.cuda(), negative_img.cuda()
-
-            anchor_vector = model(anchor_img)
-            positive_vector = model(positive_img)
-            negative_vector = model(negative_img)
-
-            loss = loss_function(anchor_vector, positive_vector, negative_vector)
-            loss.backward()
-
-            optimizer.step()
-            loss_sum += loss.item() * batch_size
+            if train_mod == "triplet":
+                anchor_img, positive_img, negative_img = data
+                loss_sum += triplet_train_step(model, optimizer, loss_function, anchor_img, positive_img, negative_img,
+                                               cuda)
+            elif train_mod == "pair":
+                face_x, face_y, label = data
+                loss_sum += pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda)
+            else:
+                raise ValueError("invalid train mod")
 
             cnt += 1.0
             finished = int((cnt * 10) / no_batches)
@@ -101,15 +102,17 @@ def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cud
                 "=" * int((cnt * 10) / no_batches) + str("." * remaining) + "] time remaining = " + str(
                     time_remaing / 60.0)[:8]) + " Avg Train_Loss=" + str(loss_sum / (cnt * batch_size))[:8])
         print()
+
         train_loss = loss_sum / dataset_size
         train_losses.append(train_loss)
-        test_loss = triplet_loss_test(model, test_loader, loss_function, cuda)
+
+        test_loss = model_test(model, test_loader, loss_function, train_mod, cuda)
         test_losses.append(test_loss)
         epoch_end_time = time.time()
 
         print()
         print(f" epoch {e + 1} train_loss ={train_loss} test_loss={test_loss}")
-        if  test_loss < min_test_loss:
+        if test_loss < min_test_loss:
             print(
                 f"new minimum test loss {str(test_loss)[:8]} ", end=" ")
             if weight_saving_path is not None:
@@ -117,7 +120,6 @@ def triplet_loss_train(model, epochs, learn_rate, train_loader, test_loader, cud
                 print("achieved, model weights saved", end=" ")
             print()
 
-            min_train_loss = train_loss
             min_test_loss = test_loss
 
         if train_loss < test_loss:
@@ -164,7 +166,51 @@ def save_epochs_to_csv(csv_save_path, train_loss, no_train_rows, test_loss, no_t
         df.to_csv(full_path, mode='a', header=False, index=False)
 
 
-def full_classification_train(face_descriptor, face_identifier, epochs, learn_rate, train_loader, test_loader,
-                              cuda=False, weight_saving_path=None,
-                              epoch_data_saving_path=None, notes=None):
-    pass
+def triplet_train_step(model, optimizer, loss_function, anchor_img, positive_img, negative_img, cuda):
+    optimizer.zero_grad()
+    anchor_img.requires_grad = True
+    positive_img.requires_grad = True
+    negative_img.requires_grad = True
+
+    if cuda:
+        anchor_img, positive_img, negative_img = anchor_img.cuda(), positive_img.cuda(), negative_img.cuda()
+
+    anchor_vector = model(anchor_img)
+    positive_vector = model(positive_img)
+    negative_vector = model(negative_img)
+
+    loss = loss_function(anchor_vector, positive_vector, negative_vector)
+    loss.backward()
+
+    optimizer.step()
+    return loss.item()
+
+
+def triplet_test_step(model, loss_function, anchor_img, positive_img, negative_img, cuda):
+    if cuda:
+        anchor_img, positive_img, negative_img = anchor_img.cuda(), positive_img.cuda(), negative_img.cuda()
+    anchor_vector = model(anchor_img)
+    positive_vector = model(positive_img)
+    negative_vector = model(negative_img)
+    loss = loss_function(anchor_vector, positive_vector, negative_vector)
+    return loss.item()
+
+
+def pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda):
+    optimizer.zero_grad()
+    if cuda:
+        face_x, face_y = face_x.cuda(), face_y.cuda()
+    predicted_result = model(face_x, face_y)
+
+    loss = loss_function(predicted_result, label)
+    loss.backward()
+    optimizer.step()
+    return loss.item()
+
+
+def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
+    if cuda:
+        face_x, face_y = face_x.cuda(), face_y.cuda()
+    predicted_result = model(face_x, face_y)
+    loss = loss_function(predicted_result, label)
+    return loss.item()
