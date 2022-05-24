@@ -200,6 +200,7 @@ def pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda
     optimizer.zero_grad()
     if cuda:
         face_x, face_y = face_x.cuda(), face_y.cuda()
+        label = label.cuda()
     predicted_result = model(face_x, face_y)
 
     loss = loss_function(predicted_result, label)
@@ -211,6 +212,7 @@ def pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda
 def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
     if cuda:
         face_x, face_y = face_x.cuda(), face_y.cuda()
+        label=label.cuda()
     predicted_result = model(face_x, face_y)
     loss = loss_function(predicted_result, label)
     return loss.item()

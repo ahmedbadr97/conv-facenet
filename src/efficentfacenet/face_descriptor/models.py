@@ -1,5 +1,6 @@
 from functools import partial
 
+import numpy as np
 import torch
 from torch.hub import load_state_dict_from_url
 from torchvision.models import EfficientNet
@@ -100,9 +101,19 @@ class EfficientFacenet(nn.Module):
 
     def classify_face_features(self, face_x, face_y):
         self.eval()
+        if not isinstance(face_x,torch.Tensor):
+            face_x=torch.tensor(face_x)
+        if not isinstance(face_y,torch.Tensor):
+            face_y=torch.tensor(face_y)
+
+        if len(face_x.shape)==1:
+            face_x=face_x.unsqueeze(0)
+        if len(face_y.shape)==1:
+            face_y=face_y.unsqueeze(0)
         with torch.no_grad():
-            output = self.classifier(face_x, face_y)
-        return output
+            classifier_input = torch.cat((face_x, face_y), dim=1)
+            output = self.classifier(classifier_input)
+        return output[0].numpy()
 
 
 def get_inverted_residual_setting(width_mult, depth_mult):
