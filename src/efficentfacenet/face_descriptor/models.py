@@ -65,8 +65,8 @@ class EfficientFacenet(nn.Module):
         self.descriptor = FaceDescriptorModel(False, "efficientnet_b1")
         if descriptor_weights_path is not None:
             self.descriptor.load_local_weights(descriptor_weights_path, True)
-        self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 128), nn.ReLU(inplace=True), nn.Dropout(0.25),
-                                        nn.Linear(128, 32), nn.ReLU(inplace=True), nn.Linear(32, 1), nn.Sigmoid())
+        self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 64), nn.ReLU(inplace=True), nn.Dropout(0.3),
+                                        nn.Linear(64, 1),nn.Sigmoid())
 
     def forward(self, face_x, face_y):
         assert face_x.shape == face_y.shape
