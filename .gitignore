@@ -2,7 +2,7 @@
 .ipynb_checkpoints/
 dataset/
 __pycache__/
-model_weights/training/
+model_weights/
 test.ipynb
  notebooks/000006.jpg
 notebooks/grp.jpg

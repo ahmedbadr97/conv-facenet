@@ -31,7 +31,5 @@ def copydir(src, dest):
     shutil.copytree(src, dest + '/' + src.split('/')[-1], copy_function=shutil.copy)
 
 
-def load_dict_from_json(path_file):
-    with open(path_file) as json_file:
-        data = json.load(json_file)
-    return data
+def copyfile_to_dir(fpath, dirPath):
+    shutil.copyfile(fpath, dirPath + '/' + fpath.split('/')[-1])
