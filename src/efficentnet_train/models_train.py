@@ -64,7 +64,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
     batch_size = train_loader.batch_size
     no_batches = len(train_loader)
     dataset_size = float(len(train_loader.dataset))
-    model.train()
+
     if cuda:
         model.cuda()
     train_losses = []
@@ -73,6 +73,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
     min_test_loss = model_test(model, test_loader, loss_function, train_mod, cuda)
     print(f"Test Loss before Training={min_test_loss}")
     for e in range(epochs):
+        model.train()
         epoch_start_time = time.time()
         loss_sum = 0.0
         model.train()

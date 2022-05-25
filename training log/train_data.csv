@@ -188,3 +188,7 @@ Train Loss,no train rows,Test Loss,No test rows,Time taken (M),Notes,Date,Time
 0.07236130489123024,10000,0.10398373014926911,2500,11.2,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,24/05/2022,21:15:00
 0.08979756202846766,10000,0.1264170308291912,2500,11.1,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,24/05/2022,21:26:00
 0.07647749749131035,10000,0.09969301054477692,2500,11.2,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,24/05/2022,21:37:00
+0.0360135965494439,10000,0.14451092095375062,2500,12.4,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,25/05/2022,02:35:00
+0.02958688244379591,10000,0.257824462556839,2500,11.9,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,25/05/2022,02:47:00
+0.04280555466799997,10000,0.10405354301035404,2500,12.1,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,25/05/2022,03:05:00
+0.03436926839221269,10000,0.11003716650605201,2500,12.4,efficient facenet stop half of the descriptor to train and the reset is training train on img_align_perp 20k photos ,25/05/2022,03:18:00
