@@ -29,3 +29,7 @@ def save_dict_to_json(path_file, data_dict):
 
 def copydir(src, dest):
     shutil.copytree(src, dest + '/' + src.split('/')[-1], copy_function=shutil.copy)
+
+
+def copyfile_to_dir(fpath, dirPath):
+    shutil.copyfile(fpath, dirPath + '/' + fpath.split('/')[-1])
