@@ -75,7 +75,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
     for e in range(epochs):
         epoch_start_time = time.time()
         loss_sum = 0.0
-
+        model.train()
         cnt = 0.0
         time_sum = 0.0
         for data in train_loader:
