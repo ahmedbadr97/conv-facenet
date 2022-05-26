@@ -1,11 +1,11 @@
 ,Mertic,Value
-0,processed rows,88192.0
-1,Model accuracy on Proceed Faces %,69.142
-2,False Positive,18560
-3,False Negative,8654
-4,precision,0.656296872395978
-5,recall,0.8037281447717531
-6,fbeta-score,0.33507192949295855
-7,avg same person distance,[0.72145605]
-8,avg diff person distance,[0.39960518]
+0,processed rows,100000.0
+1,Model accuracy on Proceed Faces %,46.926
+2,False Positive,3212
+3,False Negative,49862
+4,precision,0.04118173679498657
+5,recall,0.0027599448011039777
+6,fbeta-score,0.00014024322204375306
+7,avg same person distance,[0.10296819]
+8,avg diff person distance,[0.2269968]
 9,Model tolerance,0.55

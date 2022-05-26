@@ -52,7 +52,7 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
 def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod, cuda=False, weight_saving_path=None,
                 epoch_data_saving_path=None, notes=None
                 ):
-    optimizer = optim.Adam(model.parameters(), lr=learn_rate)
+    optimizer = optim.Adam(model.parameters(), lr=learn_rate,weight_decay=1e-4)
 
     if train_mod == "triplet":
         loss_function = TripletMarginLoss()
