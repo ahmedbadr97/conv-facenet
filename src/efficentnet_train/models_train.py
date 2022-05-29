@@ -50,16 +50,22 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
 
 
 def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod, cuda=False, weight_saving_path=None,
-                epoch_data_saving_path=None, notes=None
+                epoch_data_saving_path=None, notes=None,**kwargs
                 ):
-    optimizer = optim.Adam(model.parameters(), lr=learn_rate,weight_decay=1e-4)
-
-    if train_mod == "triplet":
-        loss_function = TripletMarginLoss()
-    elif train_mod == "pair":
-        loss_function = BCELoss()
+    if "optimizer" not in kwargs:
+        optimizer = optim.Adam(model.parameters(), lr=learn_rate,weight_decay=1e-4)
     else:
-        raise ValueError("invalid train mod")
+        optimizer=kwargs["optimizer"]
+
+    if "criterion" in kwargs:
+        loss_function=kwargs["criterion"]
+    else:
+        if train_mod == "triplet":
+            loss_function = TripletMarginLoss()
+        elif train_mod == "pair":
+            loss_function = BCELoss()
+        else:
+            raise ValueError("invalid train mod")
 
     batch_size = train_loader.batch_size
     no_batches = len(train_loader)
@@ -207,7 +213,7 @@ def pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda
     loss = loss_function(predicted_result, label)
     loss.backward()
     optimizer.step()
-    return loss.item()
+    return float(loss)
 
 
 def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
@@ -216,4 +222,4 @@ def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
         label=label.cuda()
     predicted_result = model(face_x, face_y)
     loss = loss_function(predicted_result, label)
-    return loss.item()
+    return float(loss)

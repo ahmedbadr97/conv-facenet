@@ -186,6 +186,7 @@ class FacesTripletDataset(FacesDataset):
                          select_from_negative_cnt)
 
     def __iter__(self):
+        random.shuffle(self.person_imgs_list)
         for i in range(self.no_of_rows):
             # 1- select random anchor person
             anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
@@ -219,32 +220,28 @@ class FacesPairDataset(FacesDataset):
     def __iter__(self):
         cnt = 0
         random.shuffle(self.person_imgs_list)
+        while cnt <= self.no_of_rows:
 
-        for anchor_name, anchor_imgs in self.person_imgs_list:
-            for i in range(len(anchor_imgs)):
-                # anchor
-                anchor_img_path = f'{anchor_name}/{anchor_imgs[i]}'
-                anchor_img = self.load_img(anchor_img_path)
+            # 1- select random anchor person
+            anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
+            while len(anchor_imgs) < 2:
+                anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
+            # 2- select two random pictures for the choosen person
+            random_two_same_pics = random.sample(anchor_imgs, 2)
 
-                for j in range(i + 1, len(anchor_imgs)):
-                    anchor_positive_img_path = f'{anchor_name}/{anchor_imgs[j]}'
-                    anchor_positive_img = self.load_img(anchor_positive_img_path)
+            a_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[0])
+            p_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[1])
 
-                    yield anchor_img, anchor_positive_img, torch.tensor([1.0])
+            # 3- select random negative picture that it's feature close to the chosen person
+            n_img_name = self.get_min_dist_face(anchor_per_name, anchor_img_name=random_two_same_pics[0])
 
-                    rand_person = random.choice(self.person_imgs_list)
-                    while rand_person[0] == anchor_name:
-                        rand_person = random.choice(self.person_imgs_list)
-                    rand_person_name = rand_person[0]
-                    rand_person_photos = rand_person[1]
-                    rand_photo = np.random.choice(rand_person_photos)
-                    anchor_negative_img_path = f'{rand_person_name}/{rand_photo}'
-                    anchor_negative_img = self.load_img(anchor_negative_img_path)
+            a_img = self.load_img(a_img_name)
+            p_img = self.load_img(p_img_name)
+            n_img = self.load_img(n_img_name)
 
-                    yield anchor_img, anchor_negative_img, torch.tensor([0.0])
-                    cnt += 2
-                    if cnt == self.no_of_rows:
-                        return
+            yield a_img, p_img, torch.tensor([1.0])
+            yield a_img, n_img, torch.tensor([0.0])
+            cnt += 2
 
 
 class Normalize(torch.nn.Module):
