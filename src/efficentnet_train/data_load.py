@@ -23,7 +23,7 @@ def load_image(path, transform=None, expand=False):
     return img
 
 
-def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False):
+def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False,batch_size=1):
     cnt = 0.0
     pic_features_dict = {}
     names = os.listdir(dataset_pth)
@@ -31,37 +31,47 @@ def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False):
     if cuda:
         model.cuda()
     total_time_taken = 0.0
-    total_names = float(len(names))
+    img_paths=[]
+    for name in names:
+        folder_pth = join_pth(dataset_pth, name)
+        pics_list = os.listdir(folder_pth)
+        for pic_name in pics_list:
+            pic_path = f"{name}/{pic_name}"
+            img_paths.append(pic_path)
+    total_photos = len(img_paths)
+
     with torch.no_grad():
-        for name in names:
+        for s in range(0,total_photos,batch_size):
             ts = time.time()
-            folder_pth = join_pth(dataset_pth, name)
-            pics_list = os.listdir(folder_pth)
-            for pic_name in pics_list:
-                features_vector = None
+            e=min(s+batch_size,total_photos)
+            imgs =torch.tensor([])
+            for i in range(s,e):
                 try:
-                    pic_path = join_pth(folder_pth, pic_name)
-                    face = load_image(pic_path, transform, expand=True)
-
-                    if cuda:
-                        face = face.cuda()
-                        features_vector = model(face)[0].cpu().tolist()
-                    else:
-                        features_vector = model(face)[0].tolist()
+                    img = load_image(dataset_pth+"/"+img_paths[i], transform,expand=True)
                 except:
-                    pic_features_dict[f'{name}/{pic_name}'] = None
+                    pic_features_dict[img_paths[i]] = None
+                    continue
+                imgs=torch.cat((imgs,img),dim=0)
 
-                pic_features_dict[f'{name}/{pic_name}'] = features_vector
-            cnt += 1.0
+            if cuda:
+                imgs = imgs.cuda()
+                features_vectors = model(imgs).cpu().tolist()
+            else:
+                features_vectors = model(imgs).tolist()
+            fet_idx=0
+            for path_idx in range(s, e):
+                pic_features_dict[img_paths[path_idx]]=features_vectors[fet_idx]
+                fet_idx+=1
+            cnt += float(batch_size)
             te = time.time()
             total_time_taken += (te - ts)
             avg_time_per_name = total_time_taken / cnt
-            finished_out_of_10 = int((cnt * 10.0) / total_names)
+            finished_out_of_10 = int((cnt * 10.0) / total_photos)
             remaining_out_of_10 = 10 - finished_out_of_10
 
             sys.stdout.flush()
             sys.stdout.write("\r data processed [" + str('=' * finished_out_of_10) + str(
-                '.' * remaining_out_of_10) + "] time remaing=" + str(avg_time_per_name * (total_names - cnt) / 60.0)[
+                '.' * remaining_out_of_10) + "] time remaing=" + str(avg_time_per_name * (total_photos - cnt) / 60.0)[
                                                                  0:5])
 
     model.train()
