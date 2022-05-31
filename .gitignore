@@ -13,3 +13,4 @@ test.ipynb
 face_detection/
 face_features.json
 *.json
+/model_weights/
