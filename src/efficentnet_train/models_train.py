@@ -26,10 +26,10 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
             if test_mod == "triplet":
                 anchor_img, positive_img, negative_img = data_row
                 loss_sum += triplet_test_step(model, loss_function, anchor_img, positive_img, negative_img,
-                                              cuda)
+                                              cuda)*batch_size
             elif test_mod == "pair":
                 face_x, face_y, label = data_row
-                loss_sum += pair_test_step(model, loss_function, face_x, face_y, label, cuda)
+                loss_sum += pair_test_step(model, loss_function, face_x, face_y, label, cuda)*batch_size
 
             else:
                 raise ValueError("invalid test mod")
@@ -50,21 +50,27 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
 
 
 def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod, cuda=False, weight_saving_path=None,
-                epoch_data_saving_path=None, notes=None
+                epoch_data_saving_path=None, notes=None,**kwargs
                 ):
-    optimizer = optim.Adam(model.parameters(), lr=learn_rate)
-
-    if train_mod == "triplet":
-        loss_function = TripletMarginLoss()
-    elif train_mod == "pair":
-        loss_function = BCELoss()
+    if "optimizer" not in kwargs:
+        optimizer = optim.Adam(model.parameters(), lr=learn_rate,weight_decay=1e-4)
     else:
-        raise ValueError("invalid train mod")
+        optimizer=kwargs["optimizer"]
+
+    if "criterion" in kwargs:
+        loss_function=kwargs["criterion"]
+    else:
+        if train_mod == "triplet":
+            loss_function = TripletMarginLoss()
+        elif train_mod == "pair":
+            loss_function = BCELoss()
+        else:
+            raise ValueError("invalid train mod")
 
     batch_size = train_loader.batch_size
     no_batches = len(train_loader)
     dataset_size = float(len(train_loader.dataset))
-    model.train()
+
     if cuda:
         model.cuda()
     train_losses = []
@@ -73,6 +79,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
     min_test_loss = model_test(model, test_loader, loss_function, train_mod, cuda)
     print(f"Test Loss before Training={min_test_loss}")
     for e in range(epochs):
+        model.train()
         epoch_start_time = time.time()
         loss_sum = 0.0
         model.train()
@@ -84,10 +91,10 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
             if train_mod == "triplet":
                 anchor_img, positive_img, negative_img = data
                 loss_sum += triplet_train_step(model, optimizer, loss_function, anchor_img, positive_img, negative_img,
-                                               cuda)
+                                               cuda)*batch_size
             elif train_mod == "pair":
                 face_x, face_y, label = data
-                loss_sum += pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda)
+                loss_sum += pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda)*batch_size
             else:
                 raise ValueError("invalid train mod")
 
@@ -206,7 +213,7 @@ def pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda
     loss = loss_function(predicted_result, label)
     loss.backward()
     optimizer.step()
-    return loss.item()
+    return float(loss)
 
 
 def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
@@ -215,4 +222,4 @@ def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
         label=label.cuda()
     predicted_result = model(face_x, face_y)
     loss = loss_function(predicted_result, label)
-    return loss.item()
+    return float(loss)

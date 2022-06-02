@@ -65,8 +65,9 @@ class EfficientFacenet(nn.Module):
         self.descriptor = FaceDescriptorModel(False, "efficientnet_b1")
         if descriptor_weights_path is not None:
             self.descriptor.load_local_weights(descriptor_weights_path, True)
-        self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 64), nn.SiLU(inplace=True), nn.Dropout(0.3),
-                                        nn.Linear(64, 1),nn.Sigmoid())
+        self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 128), nn.ReLU(inplace=True), nn.Dropout(),
+                                        nn.Linear(128, 32), nn.ReLU(inplace=True), nn.Dropout(), nn.Linear(32, 1),
+                                        nn.Sigmoid())
 
     def forward(self, face_x, face_y):
         assert face_x.shape == face_y.shape
@@ -99,21 +100,27 @@ class EfficientFacenet(nn.Module):
             output = self.forward(face_x, face_y)
         return output
 
-    def classify_face_features(self, face_x, face_y):
+    def classify_face_features(self, face_x, face_y, cuda=False):
         self.eval()
-        if not isinstance(face_x,torch.Tensor):
-            face_x=torch.tensor(face_x)
-        if not isinstance(face_y,torch.Tensor):
-            face_y=torch.tensor(face_y)
+        if not isinstance(face_x, torch.Tensor):
+            face_x = torch.tensor(face_x)
+        if not isinstance(face_y, torch.Tensor):
+            face_y = torch.tensor(face_y)
 
-        if len(face_x.shape)==1:
-            face_x=face_x.unsqueeze(0)
-        if len(face_y.shape)==1:
-            face_y=face_y.unsqueeze(0)
+        if len(face_x.shape) == 1:
+            face_x = face_x.unsqueeze(0)
+        if len(face_y.shape) == 1:
+            face_y = face_y.unsqueeze(0)
         with torch.no_grad():
+
             classifier_input = torch.cat((face_x, face_y), dim=1)
+            if cuda:
+                classifier_input = classifier_input.cuda()
             output = self.classifier(classifier_input)
-        return output[0].numpy()
+        if cuda:
+            return output[0].cpu().numpy()
+        else:
+            return output[0].numpy()
 
 
 def get_inverted_residual_setting(width_mult, depth_mult):

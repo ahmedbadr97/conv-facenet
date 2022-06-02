@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 
-def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None,evaluation_method=None):
+def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None,classifier=None,cuda=False):
     error = 0
     data_cnt = dataset_frame.count()[0]
     cnt = 0.0
@@ -29,15 +29,18 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
         emp1 = features_vectors_dict[img1_path]
         emp2 = features_vectors_dict[img2_path]
 
-        if evaluation_method is None:
+        if classifier is None:
             result = euclidean_distance(emp1, emp2)
         else:
-            result=evaluation_method(emp1,emp2)
+            result=classifier(emp1,emp2,cuda)
         pred_label = 0
         actual_label = row[2]
-        if result > threshold:
-            pred_label = 1
-
+        if classifier is None:
+            if result < threshold:
+                pred_label = 1
+        else:
+            if result > threshold:
+                pred_label = 1
         if pred_label != int(row[2]):
             error += 1
         confusion_matrix[int(not pred_label)][int (not actual_label)] += 1
