@@ -278,12 +278,13 @@ class FacesHardTripletDataset(FacesDataset):
 
     def print_usage_statistics(self):
         s = 0.0
+        print()
         no_pics=len(self.pics_used)
-        for k, v in self.pics_used.values():
+        for v in self.pics_used.values():
             s += v
         mean = (s / no_pics)
         std = 0.0
-        for k, v in self.pics_used.values():
+        for v in self.pics_used.values():
             std += ((v - mean) ** 2)
         std/=no_pics
         print(f"mean of unique pictures usage = {mean} and std = {std}")
