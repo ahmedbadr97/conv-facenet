@@ -260,6 +260,7 @@ class FacesHardTripletDataset(FacesDataset):
             self.add_to_img_used_pics(n_img_name)
 
             yield a_img, p_img, n_img
+        self.print_usage_statistics()
 
     def add_to_img_used_pics(self, img_path):
         self.curr_epoch_used_pics.add(img_path)
@@ -274,6 +275,18 @@ class FacesHardTripletDataset(FacesDataset):
         self.curr_epoch_used_pics = set()
         for key, item in used_pics_features.items():
             self.img_features_dict[key] = item
+
+    def print_usage_statistics(self):
+        s = 0.0
+        no_pics=len(self.pics_used)
+        for k, v in self.pics_used.values():
+            s += v
+        mean = (s / no_pics)
+        std = 0.0
+        for k, v in self.pics_used.values():
+            std += ((v - mean) ** 2)
+        std/=no_pics
+        print(f"mean of unique pictures usage = {mean} and std = {std}")
 
 
 class FacesPairDataset(FacesDataset):
