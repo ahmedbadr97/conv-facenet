@@ -23,7 +23,7 @@ def load_image(path, transform=None, expand=False):
     return img
 
 
-def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False,batch_size=1):
+def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False, batch_size=1, img_paths=None):
     cnt = 0.0
     pic_features_dict = {}
     names = os.listdir(dataset_pth)
@@ -31,37 +31,38 @@ def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False,batch_s
     if cuda:
         model.cuda()
     total_time_taken = 0.0
-    img_paths=[]
-    for name in names:
-        folder_pth = join_pth(dataset_pth, name)
-        pics_list = os.listdir(folder_pth)
-        for pic_name in pics_list:
-            pic_path = f"{name}/{pic_name}"
-            img_paths.append(pic_path)
+    if img_paths is None:
+        img_paths = []
+        for name in names:
+            folder_pth = join_pth(dataset_pth, name)
+            pics_list = os.listdir(folder_pth)
+            for pic_name in pics_list:
+                pic_path = f"{name}/{pic_name}"
+                img_paths.append(pic_path)
     total_photos = len(img_paths)
 
     with torch.no_grad():
-        for s in range(0,total_photos,batch_size):
+        for s in range(0, total_photos, batch_size):
             ts = time.time()
-            e=min(s+batch_size,total_photos)
-            imgs =torch.tensor([])
-            for i in range(s,e):
+            e = min(s + batch_size, total_photos)
+            imgs = torch.tensor([])
+            for i in range(s, e):
                 try:
-                    img = load_image(dataset_pth+"/"+img_paths[i], transform,expand=True)
+                    img = load_image(dataset_pth + "/" + img_paths[i], transform, expand=True)
                 except:
                     pic_features_dict[img_paths[i]] = None
                     continue
-                imgs=torch.cat((imgs,img),dim=0)
+                imgs = torch.cat((imgs, img), dim=0)
 
             if cuda:
                 imgs = imgs.cuda()
                 features_vectors = model(imgs).cpu().tolist()
             else:
                 features_vectors = model(imgs).tolist()
-            fet_idx=0
+            fet_idx = 0
             for path_idx in range(s, e):
-                pic_features_dict[img_paths[path_idx]]=features_vectors[fet_idx]
-                fet_idx+=1
+                pic_features_dict[img_paths[path_idx]] = features_vectors[fet_idx]
+                fet_idx += 1
             cnt += float(batch_size)
             te = time.time()
             total_time_taken += (te - ts)
@@ -216,6 +217,63 @@ class FacesTripletDataset(FacesDataset):
             n_img = self.load_img(n_img_name)
 
             yield a_img, p_img, n_img
+
+
+class FacesHardTripletDataset(FacesDataset):
+    def __init__(self, model, cuda, dataset_path, no_of_rows, transform=None, load_imgs_from_dict=False,
+                 img_features_dict=None,
+                 subset=None,
+                 select_from_negative_cnt=0):
+        self.model = model
+        self.cuda = cuda
+        if img_features_dict is None:
+            img_features_dict = get_pic_features_dict(dataset_path, model, transform, cuda, batch_size=10)
+
+        super().__init__(dataset_path, no_of_rows, transform, load_imgs_from_dict, img_features_dict, subset,
+                         select_from_negative_cnt)
+        self.curr_epoch_used_pics = set()
+        self.pics_used = {}  # dict of pic_relative_path:usage count
+
+    def __iter__(self):
+        random.shuffle(self.person_imgs_list)
+        self.update_features_dict()
+        for i in range(self.no_of_rows):
+            # 1- select random anchor person
+            anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
+            while len(anchor_imgs) < 2:
+                anchor_per_name, anchor_imgs = random.choice(self.person_imgs_list)
+            # 2- select two random pictures for the choosen person
+            random_two_same_pics = random.sample(anchor_imgs, 2)
+
+            a_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[0])
+            p_img_name = '{}/{}'.format(anchor_per_name, random_two_same_pics[1])
+
+            # 3- select random negative picture that it's feature close to the chosen person
+            n_img_name = self.get_min_dist_face(anchor_per_name, anchor_img_name=random_two_same_pics[0])
+
+            a_img = self.load_img(a_img_name)
+            p_img = self.load_img(p_img_name)
+            n_img = self.load_img(n_img_name)
+
+            self.add_to_img_used_pics(a_img_name)
+            self.add_to_img_used_pics(p_img_name)
+            self.add_to_img_used_pics(n_img_name)
+
+            yield a_img, p_img, n_img
+
+    def add_to_img_used_pics(self, img_path):
+        self.curr_epoch_used_pics.add(img_path)
+        if img_path in self.pics_used:
+            self.pics_used[img_path] += 1
+        else:
+            self.pics_used[img_path] = 1
+
+    def update_features_dict(self):
+        used_pics_features = get_pic_features_dict(self.dataset_path, self.model, self.transform, self.cuda,
+                                                   batch_size=10, img_paths=list(self.curr_epoch_used_pics))
+        self.curr_epoch_used_pics = set()
+        for key, item in used_pics_features.items():
+            self.img_features_dict[key] = item
 
 
 class FacesPairDataset(FacesDataset):
