@@ -52,7 +52,7 @@ class FaceDescriptorModel(EfficientNet):
         if transform is not None:
             faces = transform(faces)
         if len(shape) == 3:
-            faces.unsqueeze(0)
+            faces=faces.unsqueeze(0)
         with torch.no_grad():
             output = self(faces)
         return output

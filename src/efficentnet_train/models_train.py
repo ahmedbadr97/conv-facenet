@@ -40,6 +40,7 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
             time_sum += (te - ts)
             avg_time = time_sum / cnt
             time_remaing = avg_time * (no_batches - cnt)
+            sys.stdout.flush()
             sys.stdout.write("\r Testing  [" + str(
                 "=" * finished + str("." * remaining) + "] time remaining = " + str(
                     time_remaing / 60.0)[:8] + " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
@@ -105,6 +106,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
             time_sum += (batch_end_time - batch_start_t)
             avg_time = time_sum / cnt
             time_remaing = avg_time * (no_batches - cnt)
+            sys.stdout.flush()
             sys.stdout.write("\r epoch " + str(e + 1) + " [" + str(
                 "=" * int((cnt * 10) / no_batches) + str("." * remaining) + "] time remaining = " + str(
                     time_remaing / 60.0)[:8]) + " Avg Train_Loss=" + str(loss_sum / (cnt * batch_size))[:8])

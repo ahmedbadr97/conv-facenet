@@ -1,7 +1,12 @@
 import numpy as np
 import json
 import shutil
-
+import os
+def get_last_weights_path(weights_path):
+    files=os.listdir(weights_path)
+    files.sort()
+    last_weight_file_name=files[-1]
+    return f"{weights_path}/{last_weight_file_name}"
 
 def findCosineDistance(source_representation, test_representation):
     a = np.matmul(np.transpose(source_representation), test_representation)
@@ -33,3 +38,9 @@ def copydir(src, dest):
 
 def copyfile_to_dir(fpath, dirPath):
     shutil.copyfile(fpath, dirPath + '/' + fpath.split('/')[-1])
+
+
+def load_dict_from_json(path_file):
+    with open(path_file) as json_file:
+        data = json.load(json_file)
+    return data
