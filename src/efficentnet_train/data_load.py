@@ -212,9 +212,10 @@ class FaceHardSelectionDataset(FacesDataset):
         anchor_vector = self.img_features_dict[f"{anchor_name}/{anchor_img_name}"]
         for i in range(self.select_from_negative_cnt):
             person_name, person_imgs = random.choice(self.person_imgs_list)
-            while person_name == anchor_name:
-                person_name, person_imgs = random.choice(self.person_imgs_list)
             rand_img = random.choice(person_imgs)
+            while person_name == anchor_name or (f"{person_name}/{rand_img}" in self.curr_epoch_used_pics):
+                person_name, person_imgs = random.choice(self.person_imgs_list)
+                rand_img = random.choice(person_imgs)
             imgs_path.append(f"{person_name}/{rand_img}")
         min_dist = np.Inf
         min_img_path = ""

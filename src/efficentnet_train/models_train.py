@@ -137,6 +137,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
             if weight_saving_path is not None:
                 save_train_weights(model, train_loss, test_loss, weight_saving_path)
                 print("achieved, model weights saved", end=" ")
+            print()
 
             min_test_loss = test_loss
 
