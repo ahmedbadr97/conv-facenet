@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pandas as pd
 from torch import optim, no_grad
-from torch.nn import TripletMarginLoss,BCELoss
+from torch.nn import TripletMarginLoss, BCELoss
 import torch
 
 
@@ -26,10 +26,10 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
             if test_mod == "triplet":
                 anchor_img, positive_img, negative_img = data_row
                 loss_sum += triplet_test_step(model, loss_function, anchor_img, positive_img, negative_img,
-                                              cuda)*batch_size
+                                              cuda) * batch_size
             elif test_mod == "pair":
                 face_x, face_y, label = data_row
-                loss_sum += pair_test_step(model, loss_function, face_x, face_y, label, cuda)*batch_size
+                loss_sum += pair_test_step(model, loss_function, face_x, face_y, label, cuda) * batch_size
 
             else:
                 raise ValueError("invalid test mod")
@@ -40,26 +40,31 @@ def model_test(model, test_loader, loss_function, test_mod, cuda):
             time_sum += (te - ts)
             avg_time = time_sum / cnt
             time_remaing = avg_time * (no_batches - cnt)
-            sys.stdout.flush()
-            sys.stdout.write("\r Testing  [" + str(
-                "=" * finished + str("." * remaining) + "] time remaining = " + str(
-                    time_remaing / 60.0)[:8] + " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
 
+            sys.stdout.write("\r Testing  [" + str(
+                "=" * finished + str("." * remaining) + "] time remaining (m) = " + str(
+                    time_remaing / 60.0)[:8] + " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
+            sys.stdout.flush()
             test_loss = loss_sum / dataset_size
 
-        return test_loss
+    sys.stdout.write("\r Testing  [" + str(
+        "=" * 10 + "] time taken (m) = " + str(
+            time_sum / 60.0)[:8] + " Avg Test_Loss=" + str(loss_sum / (cnt * batch_size))[:8]))
+    sys.stdout.flush()
+
+    return test_loss
 
 
 def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod, cuda=False, weight_saving_path=None,
-                epoch_data_saving_path=None, notes=None,**kwargs
+                epoch_data_saving_path=None, notes=None, **kwargs
                 ):
     if "optimizer" not in kwargs:
-        optimizer = optim.Adam(model.parameters(), lr=learn_rate,weight_decay=1e-4)
+        optimizer = optim.Adam(model.parameters(), lr=learn_rate, weight_decay=1e-4)
     else:
-        optimizer=kwargs["optimizer"]
+        optimizer = kwargs["optimizer"]
 
     if "criterion" in kwargs:
-        loss_function=kwargs["criterion"]
+        loss_function = kwargs["criterion"]
     else:
         if train_mod == "triplet":
             loss_function = TripletMarginLoss()
@@ -79,6 +84,7 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
     print("Testing before training ...")
     min_test_loss = model_test(model, test_loader, loss_function, train_mod, cuda)
     print(f"Test Loss before Training={min_test_loss}")
+    print("-----------------------------------------------------")
     for e in range(epochs):
         model.train()
         epoch_start_time = time.time()
@@ -92,10 +98,10 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
             if train_mod == "triplet":
                 anchor_img, positive_img, negative_img = data
                 loss_sum += triplet_train_step(model, optimizer, loss_function, anchor_img, positive_img, negative_img,
-                                               cuda)*batch_size
+                                               cuda) * batch_size
             elif train_mod == "pair":
                 face_x, face_y, label = data
-                loss_sum += pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda)*batch_size
+                loss_sum += pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda) * batch_size
             else:
                 raise ValueError("invalid train mod")
 
@@ -108,9 +114,14 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
             time_remaing = avg_time * (no_batches - cnt)
             sys.stdout.flush()
             sys.stdout.write("\r epoch " + str(e + 1) + " [" + str(
-                "=" * int((cnt * 10) / no_batches) + str("." * remaining) + "] time remaining = " + str(
+                "=" * int((cnt * 10) / no_batches) + str("." * remaining) + "] time remaining (m) = " + str(
                     time_remaing / 60.0)[:8]) + " Avg Train_Loss=" + str(loss_sum / (cnt * batch_size))[:8])
-        print()
+        sys.stdout.write("\r epoch " + str(e + 1) + " [" + str(
+            "=" * 10 + "] time Taken (git m) = " + str(
+                time_sum / 60.0)[:8]) + " Avg Train_Loss=" + str(loss_sum / (cnt * batch_size))[:8])
+        sys.stdout.flush()
+
+        train_loader.dataset.print_usage_statistics()
 
         train_loss = loss_sum / dataset_size
         train_losses.append(train_loss)
@@ -119,7 +130,6 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
         test_losses.append(test_loss)
         epoch_end_time = time.time()
 
-        print()
         print(f" epoch {e + 1} train_loss ={train_loss} test_loss={test_loss}")
         if test_loss < min_test_loss:
             print(
@@ -136,6 +146,8 @@ def model_train(model, epochs, learn_rate, train_loader, test_loader, train_mod,
         epoch_time_taken = round((epoch_end_time - epoch_start_time) / 60, 1)
         save_epochs_to_csv(epoch_data_saving_path, train_loss, len(train_loader.dataset), test_loss,
                            len(test_loader.dataset), epoch_time_taken, notes)
+        print("-----------------------------------------------------")
+
     return train_losses, test_losses
 
 
@@ -221,7 +233,7 @@ def pair_train_step(model, optimizer, loss_function, face_x, face_y, label, cuda
 def pair_test_step(model, loss_function, face_x, face_y, label, cuda):
     if cuda:
         face_x, face_y = face_x.cuda(), face_y.cuda()
-        label=label.cuda()
+        label = label.cuda()
     predicted_result = model(face_x, face_y)
     loss = loss_function(predicted_result, label)
     return float(loss)
