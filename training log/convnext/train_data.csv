@@ -130,3 +130,14 @@ Train Loss,no train rows,Test Loss,No test rows,Time taken (M),Notes,Date,Time
 0.2100154983809218,10000,0.07523832352400059,5000,55.7,"descriptor hard negative selection , starting with test 0.2 loss calculation fixed",05/06/2022,10:39:00
 0.21134151670043502,10000,0.07400702196942294,5000,55.8,"descriptor hard negative selection , starting with test 0.2 loss calculation fixed",05/06/2022,11:34:00
 0.19449749825123291,10000,0.07388845615298487,5000,55.9,"descriptor hard negative selection , starting with test 0.2 loss calculation fixed",05/06/2022,12:30:00
+0.28024227985310135,10000,0.06671960554202087,5000,60.2,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",05/06/2022,14:33:00
+0.28952579770088194,10000,0.07817213273718954,5000,59.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",05/06/2022,15:32:00
+0.2998982970447745,10000,0.06987293490367011,5000,46.0,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",05/06/2022,20:30:00
+0.28973645493284567,10000,0.06530142408190368,5000,56.1,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",05/06/2022,21:26:00
+0.29289634903706613,10000,0.06306100847125054,5000,56.2,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",05/06/2022,22:22:00
+0.265884348310309,10000,0.06807716726898216,5000,56.1,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",05/06/2022,23:18:00
+0.2682782017026795,10000,0.07052822015471756,5000,56.1,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,00:14:00
+0.26627581099048986,10000,0.07168327052223031,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,01:10:00
+0.2499966328047347,10000,0.07029831439401023,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,02:07:00
+0.2583860105629399,10000,0.06355630854126065,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,03:03:00
+0.25539063157195635,10000,0.06614313394529744,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,03:59:00
