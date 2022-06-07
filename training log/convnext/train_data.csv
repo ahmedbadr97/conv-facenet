@@ -141,3 +141,83 @@ Train Loss,no train rows,Test Loss,No test rows,Time taken (M),Notes,Date,Time
 0.2499966328047347,10000,0.07029831439401023,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,02:07:00
 0.2583860105629399,10000,0.06355630854126065,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,03:03:00
 0.25539063157195635,10000,0.06614313394529744,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,03:59:00
+0.2691048331526457,10000,0.0636352134986082,5000,56.5,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,05:34:00
+0.27693170950294005,10000,0.06045287278805044,5000,46.1,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,07:21:00
+0.24834846740896174,10000,0.06769079548856244,5000,56.1,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,08:17:00
+0.23991833067775006,10000,0.06132565398705192,5000,56.2,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,09:14:00
+0.24670156380987027,10000,0.06009861975610256,5000,56.2,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,10:10:00
+0.231750282367249,10000,0.06114022219302133,5000,56.3,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,11:06:00
+0.2393150002481416,10000,0.05579762017806061,5000,56.4,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,12:02:00
+0.21510250479608076,10000,0.06406341955577954,5000,56.4,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,12:59:00
+0.23361114170518776,10000,0.05960057620976586,5000,56.6,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,14:49:00
+0.23036718315765028,10000,0.05482535358953755,5000,56.8,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,15:46:00
+0.2288275150855545,10000,0.06662411195207388,5000,56.8,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",06/06/2022,16:43:00
+0.6480068935394288,5000,0.5216327972412109,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,01:41:00
+0.4688108377456665,5000,0.36147108268737793,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,01:44:00
+0.3835678916931152,5000,0.3362233467102051,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,01:48:00
+0.365427596282959,5000,0.3112625579833984,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,01:52:00
+0.3619649461746216,5000,0.3192890663146973,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,01:56:00
+0.3450385042190552,5000,0.3323033313751221,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,02:00:00
+0.33886228466033935,5000,0.2938270711898804,1000,3.9, facenet classifier with convnext backens descriptor,07/06/2022,02:04:00
+0.3399951347351074,5000,0.25878908729553224,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:08:00
+0.32596779155731204,5000,0.286246132850647,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:12:00
+0.32930200862884523,5000,0.24872392177581787,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:15:00
+0.3095959367752075,5000,0.2488667392730713,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:19:00
+0.3081577960968018,5000,0.2733975887298584,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:23:00
+0.3073373416900635,5000,0.2603864517211914,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:28:00
+0.8591726800918579,5000,0.50880464553833,1000,3.7, facenet classifier with convnext backens descriptor,07/06/2022,02:38:00
+0.5447526260375977,5000,0.4965634708404541,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:42:00
+0.5487867557525635,5000,0.48484737396240235,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:46:00
+0.5047838745117188,5000,0.44927372932434084,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:54:00
+0.47934095573425295,5000,0.45702950096130374,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,02:58:00
+0.49871270027160647,5000,0.48859141731262207,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,03:01:00
+0.47712245941162107,5000,0.46914889907836915,1000,3.8, facenet classifier with convnext backens descriptor,07/06/2022,03:05:00
+0.6761764941930771,5000,0.6459859746694565,1000,4.1, facenet classifier with convnext backens descriptor full model,07/06/2022,04:07:00
+0.7095760170936585,5000,0.6947809127569199,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,04:35:00
+0.7362168507099152,5000,0.6945334768295288,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,04:49:00
+7.624866645383835,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,05:04:00
+25.420685999393463,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,05:18:00
+24.62089739499092,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,05:33:00
+33.906669488453865,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,05:47:00
+39.88086701775491,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,06:02:00
+44.80956676384807,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,06:16:00
+37.21228507938087,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,06:31:00
+46.23711523470283,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,06:45:00
+45.790057615193724,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,07:00:00
+44.78659627172649,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,07:14:00
+43.53101298415661,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,07:29:00
+47.44147722412348,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,07:43:00
+47.30805461539328,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,07:58:00
+48.46314534355402,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,08:12:00
+49.17188433151245,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,08:27:00
+49.460800577545164,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,08:41:00
+49.491466539001465,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,08:56:00
+49.79886752471924,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,09:10:00
+49.88241100387573,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,09:25:00
+49.738122203063966,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,09:39:00
+47.45867654178142,5000,50.1,1000,14.5, facenet classifier with convnext backens descriptor full model,07/06/2022,09:54:00
+49.53055505218506,5000,50.1,1000,14.4, facenet classifier with convnext backens descriptor full model,07/06/2022,10:08:00
+49.835101615905764,5000,50.1,1000,14.4, facenet classifier with convnext backens descriptor full model,07/06/2022,10:22:00
+49.6842992111206,5000,50.1,1000,14.4, facenet classifier with convnext backens descriptor full model,07/06/2022,10:37:00
+49.80255946655274,5000,50.1,1000,14.4, facenet classifier with convnext backens descriptor full model,07/06/2022,10:51:00
+49.95215085754395,5000,50.1,1000,14.4, facenet classifier with convnext backens descriptor full model,07/06/2022,11:06:00
+49.51661852416992,5000,50.1,1000,14.4, facenet classifier with convnext backens descriptor full model,07/06/2022,11:20:00
+49.88949841918945,5000,50.1,1000,14.3, facenet classifier with convnext backens descriptor full model,07/06/2022,11:35:00
+50.18846850128174,5000,50.1,1000,14.3, facenet classifier with convnext backens descriptor full model,07/06/2022,11:49:00
+0.5787986682891846,5000,0.44303211402893067,1000,3.9, facenet classifier with convnext backens descriptor full model,07/06/2022,12:27:00
+0.4157005752563477,5000,0.3366858530044556,1000,3.9, facenet classifier with convnext backens descriptor full model,07/06/2022,12:31:00
+0.3523120012283325,5000,0.3224426383972168,1000,3.9, facenet classifier with convnext backens descriptor full model,07/06/2022,12:34:00
+0.3409169609069824,5000,0.3011755666732788,1000,3.9, facenet classifier with convnext backens descriptor full model,07/06/2022,12:38:00
+0.3203640354156494,5000,0.2887721977233887,1000,3.8, facenet classifier with convnext backens descriptor full model,07/06/2022,12:42:00
+0.3058000883102417,5000,0.2870634965896606,1000,3.8, facenet classifier with convnext backens descriptor full model,07/06/2022,12:46:00
+0.30187023849487304,5000,0.3056025485992432,1000,3.8, facenet classifier with convnext backens descriptor full model,07/06/2022,12:50:00
+0.30394228897094727,5000,0.30548236083984376,1000,3.8, facenet classifier with convnext backens descriptor full model,07/06/2022,12:53:00
+0.30363777084350585,5000,0.2730433549880981,1000,3.8, facenet classifier with convnext backens descriptor full model,07/06/2022,12:58:00
+0.303282120513916,5000,0.273125527381897,1000,3.9, facenet classifier with convnext backens descriptor full model,07/06/2022,13:02:00
+0.0657855523467064,5000,0.07087375121377408,2500,23.1, facenet classifier with convnext backens descriptor full model,07/06/2022,14:36:00
+0.24505671080562752,10000,0.061659410783147905,5000,32.1,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",07/06/2022,16:25:00
+0.22299112134889293,10000,0.05285494409550447,5000,41.9,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",07/06/2022,17:07:00
+0.2202320514753519,10000,0.04951982831228524,5000,40.0,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",07/06/2022,17:47:00
+0.2195515510220197,10000,0.0564374073455605,5000,39.8,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",07/06/2022,18:27:00
+0.22320117535610043,10000,0.05397670272515388,5000,39.9,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",07/06/2022,19:07:00
+0.21256729838975588,10000,0.061257475764490664,5000,39.9,"descriptor hard negative selection from 10 not 5 , starting with test 0.2 loss calculation fixed",07/06/2022,19:47:00

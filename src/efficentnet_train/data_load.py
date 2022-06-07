@@ -348,8 +348,8 @@ class FacesPairDataset(FacesDataset):
 class Normalize(torch.nn.Module):
 
     def forward(self, img):
-        t_mean = torch.mean(img, dim=[1, 2])
-        t_std = torch.std(img, dim=[1, 2])
+        t_mean = torch.mean(img, dim=[0, 1])
+        t_std = torch.std(img, dim=[0, 1])
         return normalize(img, t_mean.__array__(), t_std.__array__())
 
     def __init__(self):
