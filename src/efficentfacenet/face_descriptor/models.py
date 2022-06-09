@@ -1,23 +1,18 @@
-
 import numpy as np
 import torch
 
 from torch import load, save, nn, Tensor
-from torchvision.models import convnext_tiny
+from torchvision.models import inception_v3,Inception3
 import torch.nn.functional as F
 
 
-class FaceDescriptorModel(nn.Module):
+class FaceDescriptorModel(Inception3):
 
     def __init__(self, download_weights=False, output_size=128):
         super().__init__()
-
-        convnext_tiny_model=convnext_tiny(pretrained=download_weights)
-        self.features=convnext_tiny_model.features
+        self.inception_resnet = inception_v3(pretrained=download_weights)
+        self.inception_resnet.fc = nn.Linear(self.inception_resnet.fc.in_features, output_size)
         # Change Full connected layer
-        self.classifier = convnext_tiny_model.classifier
-        self.avgpool = nn.AdaptiveAvgPool2d(1)
-        self.classifier[-1]=nn.Linear(self.classifier[-1].in_features,output_size)
 
     def load_local_weights(self, path, cuda_weights=False):
         if cuda_weights:
@@ -27,17 +22,10 @@ class FaceDescriptorModel(nn.Module):
             state_dict = load(path)
         self.load_state_dict(state_dict)
 
-
     def save_weights(self, path):
 
         state_dict = self.state_dict()
         save(state_dict, path)
-
-    def forward(self, x: Tensor) -> Tensor:
-        x = self.features(x)
-        x = self.avgpool(x)
-        x = self.classifier(x)
-        return x
 
     def feature_vector(self, faces, transform=None):
         """
@@ -52,7 +40,7 @@ class FaceDescriptorModel(nn.Module):
         if transform is not None:
             faces = transform(faces)
         if len(shape) == 3:
-            faces=faces.unsqueeze(0)
+            faces = faces.unsqueeze(0)
         with torch.no_grad():
             output = self(faces)
         return output
@@ -66,7 +54,7 @@ class EfficientFacenet(nn.Module):
         if descriptor_weights_path is not None:
             self.descriptor.load_local_weights(descriptor_weights_path, True)
         self.classifier = nn.Sequential(nn.Linear(face_features_dim * 2, 128), nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(128, 1),nn.Sigmoid())
+                                        nn.Linear(128, 1), nn.Sigmoid())
 
     def forward(self, face_x, face_y):
         assert face_x.shape == face_y.shape
@@ -120,5 +108,3 @@ class EfficientFacenet(nn.Module):
             return output[0].cpu().numpy()
         else:
             return output[0].numpy()
-
-
