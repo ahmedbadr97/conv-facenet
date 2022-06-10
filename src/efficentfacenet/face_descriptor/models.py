@@ -2,16 +2,15 @@ import numpy as np
 import torch
 
 from torch import load, save, nn, Tensor
-from torchvision.models import inception_v3,Inception3
+from torchvision.models import inception_v3, Inception3
 import torch.nn.functional as F
 
 
-class FaceDescriptorModel(Inception3):
+class FaceDescriptorModel(nn.Module):
 
     def __init__(self, download_weights=False, output_size=128):
         super().__init__()
-        self.inception_resnet = inception_v3(pretrained=download_weights)
-        self.inception_resnet.fc = nn.Linear(self.inception_resnet.fc.in_features, output_size)
+        self.inception_resnet = inception_v3(pretrained=download_weights,num_classes=128)
         # Change Full connected layer
 
     def load_local_weights(self, path, cuda_weights=False):
@@ -21,6 +20,9 @@ class FaceDescriptorModel(Inception3):
         else:
             state_dict = load(path)
         self.load_state_dict(state_dict)
+
+    def forward(self, x):
+        return self.inception_resnet(x)
 
     def save_weights(self, path):
 

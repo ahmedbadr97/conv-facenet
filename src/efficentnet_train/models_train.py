@@ -200,7 +200,9 @@ def triplet_train_step(model, optimizer, loss_function, anchor_img, positive_img
     positive_vector = model(positive_img)
     negative_vector = model(negative_img)
 
-    loss = loss_function(anchor_vector, positive_vector, negative_vector)
+    loss1 = loss_function(anchor_vector[0], positive_vector[0], negative_vector[0])
+    loss2 = loss_function(anchor_vector[0], positive_vector[0], negative_vector[0])
+    loss = loss1 + 0.4 * loss2
     loss.backward()
 
     optimizer.step()
