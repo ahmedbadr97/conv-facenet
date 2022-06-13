@@ -7,7 +7,7 @@ import numpy as np
 from os.path import join as join_pth
 from PIL import Image
 import torch
-from torch.utils.data import Dataset, IterableDataset
+from torch.utils.data import  IterableDataset
 from torchvision.transforms.functional import normalize
 from . import utils
 

@@ -14,3 +14,9 @@ face_detection/
 face_features.json
 *.json
 /model_weights/
+
+~$train_data_effnet2.xlsx
+train_data_effnet2.xlsx
+train_data_effnet.xlsx
+train_data_effnet.csv
+New Microsoft Visio Drawing.vsdx
