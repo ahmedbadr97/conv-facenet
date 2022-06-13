@@ -1,7 +1,7 @@
 import sys
 import time
 
-from .utils import euclidean_distance
+from .utils import euclidean_distance,findCosineDistance
 import pandas as pd
 import os
 

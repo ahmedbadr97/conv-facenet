@@ -154,7 +154,7 @@ class FacesDataset(IterableDataset):
 
     def load_img(self, img_path):
         if not self.load_imgs_from_dict or img_path not in self.images_dict:
-            img = np.array(Image.open(self.dataset_path + "/" + img_path))
+            img = Image.open(self.dataset_path + "/" + img_path)
         else:
             img = self.images_dict[img_path]
 
