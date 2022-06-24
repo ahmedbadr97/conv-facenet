@@ -78,18 +78,18 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
                                    columns=['Actual True', 'Actual False'])
     precision = (confusion_matrix[0][0]) / (confusion_matrix[0][0] + confusion_matrix[0][1] + 1)
     recall = (confusion_matrix[0][0]) / (confusion_matrix[0][0] + confusion_matrix[1][0] + 1)
-    beta = 0.5
+    beta = 1.0
     beta_squared = beta ** 2
     fbeta_score = ((1 + beta_squared) * (precision * recall)) / ((beta_squared * precision) + recall + 1)
-    error_matrix = [['processed rows', cnt],
-                    ['Model accuracy on Proceed Faces %', round(accuracy, 3)],
-                    ['False Positive', confusion_matrix[0][1]],
-                    ['False Negative', confusion_matrix[1][0]],
-                    ['precision', precision],
-                    ['recall', recall],
-                    ['fbeta-score', fbeta_score],
-                    ['avg same person distance', avg_dist_same_persons],
-                    ['avg diff person distance', avg_dist_diff_persons],
+    error_matrix = [['processed rows', int(cnt)],
+                    ['Model accuracy on Proceed Faces %', round(accuracy, 2)],
+                    ['False Positive', int(confusion_matrix[0][1])],
+                    ['False Negative', int(confusion_matrix[1][0])],
+                    ['precision', round(precision,3)],
+                    ['recall', round(recall,3)],
+                    ['fbeta-score', round(fbeta_score,3)],
+                    ['avg same person distance', round(avg_dist_same_persons,3)],
+                    ['avg diff person distance', round(avg_dist_diff_persons,3)],
                     ['Model tolerance', threshold]
                     ]
     model_name = "efficentnet"
