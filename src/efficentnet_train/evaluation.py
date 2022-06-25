@@ -1,12 +1,12 @@
 import sys
 import time
 
-from .utils import euclidean_distance,findCosineDistance
+from .utils import euclidean_distance, findCosineDistance
 import pandas as pd
 import os
 
 
-def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None,classifier=None,cuda=False):
+def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None, classifier=None, cuda=False):
     error = 0
     data_cnt = dataset_frame.count()[0]
     cnt = 0.0
@@ -32,7 +32,7 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
         if classifier is None:
             result = euclidean_distance(emp1, emp2)
         else:
-            result=classifier(emp1,emp2,cuda)
+            result = classifier(emp1, emp2, cuda)
         pred_label = 0
         actual_label = row[2]
         if classifier is None:
@@ -43,7 +43,7 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
                 pred_label = 1
         if pred_label != int(row[2]):
             error += 1
-        confusion_matrix[int(not pred_label)][int (not actual_label)] += 1
+        confusion_matrix[int(not pred_label)][int(not actual_label)] += 1
         if pred_label == 1 and actual_label == 0:
             false_positive_rows.append(row)
         if pred_label == 0 and actual_label == 1:
@@ -80,16 +80,16 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
     recall = (confusion_matrix[0][0]) / (confusion_matrix[0][0] + confusion_matrix[1][0] + 1)
     beta = 1.0
     beta_squared = beta ** 2
-    fbeta_score = ((1 + beta_squared) * (precision * recall)) / ((beta_squared * precision) + recall + 1)
+    fbeta_score = (1.0 + beta_squared) / ((beta_squared / recall) + (1 / precision))
     error_matrix = [['processed rows', int(cnt)],
                     ['Model accuracy on Proceed Faces %', round(accuracy, 2)],
                     ['False Positive', int(confusion_matrix[0][1])],
                     ['False Negative', int(confusion_matrix[1][0])],
-                    ['precision', round(precision,3)],
-                    ['recall', round(recall,3)],
-                    ['fbeta-score', round(fbeta_score,3)],
-                    ['avg same person distance', round(avg_dist_same_persons,3)],
-                    ['avg diff person distance', round(avg_dist_diff_persons,3)],
+                    ['precision', round(precision, 3)],
+                    ['recall', round(recall, 3)],
+                    ['fbeta-score', round(fbeta_score, 3)],
+                    ['avg same person distance', round(avg_dist_same_persons, 3)],
+                    ['avg diff person distance', round(avg_dist_diff_persons, 3)],
                     ['Model tolerance', threshold]
                     ]
     model_name = "efficentnet"
