@@ -80,7 +80,7 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
     recall = (confusion_matrix[0][0]) / (confusion_matrix[0][0] + confusion_matrix[1][0] + 1)
     beta = 1.0
     beta_squared = beta ** 2
-    fbeta_score = ((1 + beta_squared) * (precision * recall)) / ((beta_squared * precision) + recall + 1)
+    fbeta_score = ((1 + beta_squared) * (precision * recall)) / ((beta_squared * precision) + recall)
     error_matrix = [['processed rows', int(cnt)],
                     ['Model accuracy on Proceed Faces %', round(accuracy, 2)],
                     ['False Positive', int(confusion_matrix[0][1])],

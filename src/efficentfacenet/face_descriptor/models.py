@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 from torch import load, save, nn, Tensor
-from torchvision.models import convnext_tiny
+from torchvision.models import efficientnet_b1
 import torch.nn.functional as F
 
 
@@ -12,11 +12,11 @@ class FaceDescriptorModel(nn.Module):
     def __init__(self, download_weights=False, output_size=128):
         super().__init__()
 
-        convnext_tiny_model=convnext_tiny(pretrained=download_weights)
-        self.features=convnext_tiny_model.features
+        efficientnet_b1_model=efficientnet_b1(pretrained=download_weights)
+        self.features=efficientnet_b1_model.features
         # Change Full connected layer
-        self.classifier = convnext_tiny_model.classifier
         self.avgpool = nn.AdaptiveAvgPool2d(1)
+        self.classifier = efficientnet_b1_model.classifier
         self.classifier[-1]=nn.Linear(self.classifier[-1].in_features,output_size)
 
     def load_local_weights(self, path, cuda_weights=False):
@@ -36,6 +36,7 @@ class FaceDescriptorModel(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         x = self.features(x)
         x = self.avgpool(x)
+        x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
 
