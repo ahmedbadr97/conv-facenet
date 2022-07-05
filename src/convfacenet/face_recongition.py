@@ -1,5 +1,6 @@
 import os
 import gdown as gdown
+import torch.cuda
 from torch import no_grad
 from .face_detection import *
 from .face_descriptor.models import FaceDescriptorModel
@@ -21,9 +22,15 @@ def faces_features(img: Image):
         raise ValueError("No faces detected in the passed photo")
     global face_descriptor
     global model_transform
+    cuda_available=torch.cuda.is_available()
     if "face_descriptor" not in globals() or face_descriptor is None:
         face_descriptor = FaceDescriptorModel()
         load_descriptor_model_weights(face_descriptor)
+        if cuda_available:
+            face_descriptor.cuda()
+
+
+
 
     if "model_transform" not in globals():
         model_transform = transforms.Compose(
@@ -34,9 +41,12 @@ def faces_features(img: Image):
     for face_image in faces_images:
         face_transformed = model_transform(face_image)
         face_transformed = face_transformed.unsqueeze(0)
-
+        if cuda_available:
+            face_transformed=face_transformed.cuda()
         with no_grad():
             face_features = face_descriptor(face_transformed)[0]
+            if cuda_available:
+                face_features = face_features.cpu()
             faces_features_list.append(face_features.numpy())
     return faces_features_list
 
