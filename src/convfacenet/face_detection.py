@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 import math
 from .face_detector import RetinaFace
-
+import torch
 
 def alignment_procedure(img, left_eye, right_eye):
     """
@@ -101,7 +101,7 @@ def detect_face(img: Image, target_size=(240, 240), detection_threshold=0.85):
     global face_detector
     global cuda_available
     if "face_detector" not in globals():
-        if cuda_available:
+        if torch.cuda.is_available():
             face_detector = RetinaFace(gpu_id=1)
         else:
             face_detector = RetinaFace()

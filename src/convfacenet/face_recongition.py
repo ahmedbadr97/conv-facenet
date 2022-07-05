@@ -22,7 +22,7 @@ def faces_features(img: Image):
         raise ValueError("No faces detected in the passed photo")
     global face_descriptor
     global model_transform
-    global cuda_available
+    cuda_available=torch.cuda.is_available()
     if "face_descriptor" not in globals() or face_descriptor is None:
         face_descriptor = FaceDescriptorModel()
         load_descriptor_model_weights(face_descriptor)
