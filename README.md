@@ -119,8 +119,20 @@ mean of photo count for each identity=19
 - all train history from 15/5/2022 stored in csv file , trying different algorithms and changing the classifier architecture , input normalization , changing learning rate , data loading
 ## efficientnet model
 - I started first with efficientnet-b1 model with a small portion of img-CelbA dataset about 25,000 picture to test the model and select the best architecture for fully connected classifier model
-
 ### Train on small subset from data
 - 131 epoch form 16/5/2022 to 25/5/2022
 - ![effnett_subset_train_table.PNG](readme-assets/effnett_subset_train_table.PNG)
 - ![effnett_subset_train_table.PNG](readme-assets/effnett_subset_train_curve.PNG)
+
+### Train on full dataset
+- used classifier architecture --> (1280,256,128)
+- train transform used --> (Random Horizontal flip, random Rotation , Random Auto Contrast, standardization)
+- 230 epoch form 26/5/2022 to 3/6/2022
+- ![effnet_fulldata-table.JPG](readme-assets/effnet_fulldata-table.JPG)
+- ![effnet_fulldata-curve.JPG](readme-assets/effnet_fulldata-curve.JPG)
+
+## Convnext Model
+- used classifier architecture --> (768,128)
+- I observed that efficientnet converges with high speed at the first epochs then test loss fixed for a long
+- ![convnext_fulldata_table.JPG](readme-assets/convnext_fulldata_table.JPG)
+- ![convnext_fulldata_curve.JPG](readme-assets/convnext_fulldata_curve.JPG)
