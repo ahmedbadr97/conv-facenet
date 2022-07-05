@@ -6,7 +6,9 @@ import pandas as pd
 import os
 
 
-def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None, classifier=None, cuda=False):
+def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path=None,distance_method=None ,classifier=None, cuda=False):
+    if distance_method is None:
+        distance_method=euclidean_distance
     error = 0
     data_cnt = dataset_frame.count()[0]
     cnt = 0.0
@@ -30,7 +32,7 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
         emp2 = features_vectors_dict[img2_path]
 
         if classifier is None:
-            result = euclidean_distance(emp1, emp2)
+            result = distance_method(emp1, emp2)
         else:
             result = classifier(emp1, emp2, cuda)
         pred_label = 0
