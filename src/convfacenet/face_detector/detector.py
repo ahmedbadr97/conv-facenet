@@ -25,7 +25,7 @@ class RetinaFace:
     ):
         self.gpu_id = gpu_id
         self.device = (
-            torch.device("cpu") if gpu_id == -1 else torch.device("cuda", gpu_id)
+            torch.device("cpu") if gpu_id == -1 else torch.device("cuda")
         )
         self.model = load_net(model_path, self.device, network)
 
