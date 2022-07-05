@@ -1,10 +1,8 @@
 
-import numpy as np
 import torch
 
 from torch import load, save, nn, Tensor
 from torchvision.models import convnext_tiny
-import torch.nn.functional as F
 
 
 class FaceDescriptorModel(nn.Module):
@@ -58,7 +56,7 @@ class FaceDescriptorModel(nn.Module):
         return output
 
 
-class EfficientFacenet(nn.Module):
+class FacenetClassifier(nn.Module):
     def __init__(self, face_features_dim=128, descriptor_weights_path=None):
         super().__init__()
 

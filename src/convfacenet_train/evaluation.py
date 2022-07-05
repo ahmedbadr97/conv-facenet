@@ -92,7 +92,7 @@ def model_test(features_vectors_dict, dataset_frame, threshold=0.5, results_path
                     ['avg diff person distance', round(avg_dist_diff_persons, 3)],
                     ['Model tolerance', threshold]
                     ]
-    model_name = "efficentnet"
+    model_name = "convfacenet"
 
     error_table = pd.DataFrame(error_matrix, columns=['Mertic', 'Value'])
 

@@ -2,7 +2,7 @@
 - using conv-next as base model for face recognition with pytorch
 - the model trained on CelebFaces large-scale face dataset with more than 200K celebrity images 
 - model  accuracy on CelebA dataset about 93.6% and on Labeled faces in the wild (LFW) 95.8%
-- all src code for the model for direct usage exits in [src/efficentfacenet](src/efficentfacenet)
+- all src code for the model for direct usage exits in [src/efficentfacenet](src/convfacenet)
 
 # Dataset
 ## [CelebFaces Attributes (CelebA) Dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) 
@@ -77,7 +77,7 @@ mean of photo count for each identity=19
 #### random anchor negative selection
 - first select random person(a)  from all train identities , then select two random pictures for person (a)
 - select random negative person (b) then select random photo for person (b)
-- data loader --> FacesTripletDataset class in [data_loader.py](src/efficentnet_train/data_load.py)
+- data loader --> FacesTripletDataset class in [data_loader.py](src/convfacenet_train/data_load.py)
 #### Hard anchor negative selection
 - before training extract all image features by the last weights checkpoint for the model in a dictionary `img_features_dict key-->"img_full_path" value-->[image feature vector]`
 - images used as **anchor negative** image ,it's features are updated after each epoch 
@@ -89,7 +89,7 @@ mean of photo count for each identity=19
 - each epoch update `img_features_dict` ,reload used images in previous epoch with the new updated weights after the epoch
 
 ## Train data loaders
-- [data_load.py](src/efficentnet_train/data_load.py)
+- [data_load.py](src/convfacenet_train/data_load.py)
 - `FacesDataset`
   - parent class for faces dataset loader , loads all identities and each identity photos path
   - the class takes the dataset path , no of rows per epoch , transforms you want to apply for image
@@ -104,7 +104,7 @@ mean of photo count for each identity=19
   
 
 ## Training Loop
-- [models_train.py](src/efficentnet_train/models_train.py)
+- [models_train.py](src/convfacenet_train/models_train.py)
 - train loss and test loss logged while training
 - model weights saved after each epoch if the test loss reaches a new minimum test loss in the given model weights path
 - avg time remaining and time taken  calculated during training
