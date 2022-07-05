@@ -1,6 +1,7 @@
 # conv-facenet
 - using conv-next as base model for face recognition with pytorch
-- the model trained on CelebFaces large-scale face dataset with more than 200K celebrity images with accuracy about 93.8%
+- the model trained on CelebFaces large-scale face dataset with more than 200K celebrity images 
+- model  accuracy on CelebA dataset about 93.6% and on Labeled faces in the wild (LFW) 95.8%
 - all src code for the model for direct usage exits in [src/efficentfacenet](src/efficentfacenet)
 
 # Dataset
@@ -136,3 +137,11 @@ mean of photo count for each identity=19
 - I observed that efficientnet converges with high speed at the first epochs then test loss fixed for a long
 - ![convnext_fulldata_table.JPG](readme-assets/convnext_fulldata_table.JPG)
 - ![convnext_fulldata_curve.JPG](readme-assets/convnext_fulldata_curve.JPG)
+
+
+# Model Evaluation
+## CelebA dataset
+- ![convnext_Accuracy_CelbA.JPG](readme-assets/convnext_Accuracy_CelbA.JPG)
+
+## Labeled Faces in the Wild (LFW) dataset
+- ![convnext_Accuracy_LFW.JPG](readme-assets/convnext_Accuracy_LFW.JPG)
