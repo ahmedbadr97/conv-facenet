@@ -1,10 +1,15 @@
+import os
+
 import cv2
+import gdown
+
 from . import utils
 import numpy as np
 from PIL import Image
 import math
 from .face_detector import RetinaFace
 import torch
+
 
 def alignment_procedure(img, left_eye, right_eye):
     """
@@ -94,18 +99,18 @@ def detect_face(img: Image, target_size=(240, 240), detection_threshold=0.85):
     """
     detect and align face and resize in image
     :param detection_threshold: threshold for face detection model to classify the detected object as face
-    :param img_path: face image path
+    :param img face image
     :param target_size:
     :return: aligned and resized face image
     """
     global face_detector
     global cuda_available
     if "face_detector" not in globals():
+        weights_path = download_detector_model_weights()
         if torch.cuda.is_available():
-            face_detector = RetinaFace(gpu_id=1)
+            face_detector = RetinaFace(gpu_id=1, model_path=weights_path)
         else:
-            face_detector = RetinaFace()
-
+            face_detector = RetinaFace(model_path=weights_path)
 
     p_width, p_len = img.size
     if p_width > 1024:
@@ -143,3 +148,15 @@ def detect_face(img: Image, target_size=(240, 240), detection_threshold=0.85):
         detected_faces_images.append(face)
 
     return detected_faces_images
+
+
+def download_detector_model_weights():
+    url = "https://drive.google.com/u/1/uc?id=1a_FLk4TxX2NoKJsrP2h50XXE6_2Nm_A1&export=download"
+    weights_path = os.path.abspath("model_weights/final_weights/face_detector.pt")
+    if not os.path.exists(weights_path):
+        if not os.path.exists(os.path.abspath("model_weights")):
+            os.mkdir(os.path.abspath("model_weights"))
+        if not os.path.exists(os.path.abspath("model_weights/final_weights")):
+            os.mkdir("model_weights/final_weights")
+        gdown.download(url, weights_path, quiet=False)
+    return weights_path

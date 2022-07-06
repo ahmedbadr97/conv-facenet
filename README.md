@@ -4,6 +4,33 @@
 - model  accuracy on CelebA dataset about 93.6% and on Labeled faces in the wild (LFW) 95.8%
 - all src code for the model for direct usage exits in [src/efficentfacenet](src/convfacenet)
 
+
+# model direct usage
+- you can install the model in your project and use it directly the detector + descriptor for feature extraction and verification and face detection and extraction
+
+- `pip install git+https://github.com/ahmedbadr97/conv-facenet`
+``` python
+import convfacenet
+# you can extract faces features from photo
+img=convfacenet.load_image(img_path)
+faces_feature_list=convfacenet.faces_features(img)
+
+# ___ get croped aligned faces images from image ___
+
+faces_imgs=convfacenet.detect_face(img)
+# you can specify face imgs size  
+faces_imgs=convfacenet.detect_face(img,target_size(240,240))
+
+# ___ verify two faces are for same person or not ___
+img1=convfacenet.load_image(img1_path)
+img2=convfacenet.load_image(img2_path)
+
+boolean_result,prediction_value=convfacenet.verify_faces(img1,img2)
+# specify threshold --> best 0.4
+boolean_result,prediction_value=convfacenet.verify_faces(img1,img2,threshold=0.45)
+
+ 
+```
 # Dataset
 ## [CelebFaces Attributes (CelebA) Dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) 
 <p align="center"><img src="readme-assets/Celba.png" alt="img-celba" width="720" height="250" /> </p>  

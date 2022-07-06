@@ -22,15 +22,12 @@ def faces_features(img: Image):
         raise ValueError("No faces detected in the passed photo")
     global face_descriptor
     global model_transform
-    cuda_available=torch.cuda.is_available()
+    cuda_available = torch.cuda.is_available()
     if "face_descriptor" not in globals() or face_descriptor is None:
         face_descriptor = FaceDescriptorModel()
         load_descriptor_model_weights(face_descriptor)
         if cuda_available:
             face_descriptor.cuda()
-
-
-
 
     if "model_transform" not in globals():
         model_transform = transforms.Compose(
@@ -42,7 +39,7 @@ def faces_features(img: Image):
         face_transformed = model_transform(face_image)
         face_transformed = face_transformed.unsqueeze(0)
         if cuda_available:
-            face_transformed=face_transformed.cuda()
+            face_transformed = face_transformed.cuda()
         with no_grad():
             face_features = face_descriptor(face_transformed)[0]
             if cuda_available:
@@ -71,8 +68,10 @@ def verify_faces(face1_img, face2_img, threshold=0.4):
 def load_descriptor_model_weights(model):
     url = "https://drive.google.com/u/1/uc?id=1sighXzyFufqurh4M4dqB4sNWcTA9PccO&export=download"
     weights_path = os.path.abspath("model_weights/final_weights/face_descriptor.pt")
-    if not os.path.exists(os.path.abspath("model_weights")):
-        os.mkdir(os.path.abspath("model_weights"))
-        os.mkdir("model_weights/final_weights")
+    if not os.path.exists(weights_path):
+        if not os.path.exists(os.path.abspath("model_weights")):
+            os.mkdir(os.path.abspath("model_weights"))
+        if not os.path.exists(os.path.abspath("model_weights/final_weights")):
+            os.mkdir("model_weights/final_weights")
         gdown.download(url, weights_path, quiet=False)
     model.load_local_weights(weights_path, True)
