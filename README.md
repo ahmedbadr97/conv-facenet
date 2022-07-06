@@ -161,7 +161,6 @@ mean of photo count for each identity=19
 
 ## Convnext Model
 - used classifier architecture --> (768,128)
-- I observed that efficientnet converges with high speed at the first epochs then test loss fixed for a long
 - ![convnext_fulldata_table.JPG](readme-assets/convnext_fulldata_table.JPG)
 - ![convnext_fulldata_curve.JPG](readme-assets/convnext_fulldata_curve.JPG)
 
