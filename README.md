@@ -2,7 +2,7 @@
 - using conv-next as base model for face recognition with pytorch
 - the model trained on CelebFaces large-scale face dataset with more than 200K celebrity images 
 - model  accuracy on CelebA dataset about 93.6% and on Labeled faces in the wild (LFW) 95.8%
-- all src code for the model for direct usage exits in [src/efficentfacenet](src/convfacenet)
+- all src code for the model for direct usage exits in [src/convfacenet](src/convfacenet)
 
 
 # model direct usage
