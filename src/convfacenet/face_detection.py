@@ -94,7 +94,7 @@ def detect_face(img: Image, target_size=(240, 240), detection_threshold=0.85):
     """
     detect and align face and resize in image
     :param detection_threshold: threshold for face detection model to classify the detected object as face
-    :param img_path: face image path
+    :param img face image
     :param target_size:
     :return: aligned and resized face image
     """

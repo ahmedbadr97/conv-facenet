@@ -24,6 +24,17 @@ def load_image(path, transform=None, expand=False):
 
 
 def get_pic_features_dict(dataset_pth, model, transform=None, cuda=False, batch_size=1, img_paths=None):
+    """
+    get features dictionary from dataset_path
+    dataset expected path root/x/img1.jpg
+    :param dataset_pth: dataset path root
+    :param model: descriptor model object
+    :param transform: torchvision transform
+    :param cuda: (bool) cuda available
+    :param batch_size:
+    :param img_paths: specify subset from the data
+    :return: features dictionary {x/imgname.jpg:[img_feature_vector]}
+    """
     cnt = 0.0
     pic_features_dict = {}
     names = os.listdir(dataset_pth)
